@@ -1,0 +1,35 @@
+{
+	"name": "pi-game-launcher",
+	"version": "1.0.0",
+	"description": "Pi game launcher monorepo",
+	"private": true,
+	"type": "module",
+	"engines": {
+		"node": ">=26"
+	},
+	"workspaces": [
+		"client",
+		"server",
+		"shared"
+	],
+	"scripts": {
+		"dev": "npm run dev -w @repo/server & npm run dev -w @repo/client",
+		"build": "npm run build -w @repo/client",
+		"start": "npm run start -w @repo/server",
+		"typecheck": "npm run typecheck --workspaces --if-present",
+		"test": "npm run test --workspaces --if-present",
+		"lint": "eslint .",
+		"lint:fix": "eslint . --fix",
+		"format": "prettier --write '**/*.{js,jsx,ts,tsx,json,md,scss}'"
+	},
+	"devDependencies": {
+		"@eslint/js": "^10.0.1",
+		"eslint": "^10.10.0",
+		"eslint-plugin-react-hooks": "^7.1.1",
+		"prettier": "^3.9.6",
+		"type-fest": "^5.10.0",
+		"typescript": "^6.0.3",
+		"typescript-eslint": "^8.70.0",
+		"vitest": "^5.0.0"
+	}
+}

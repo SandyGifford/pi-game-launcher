@@ -1,0 +1,12 @@
+import type { FC } from "react";
+import { memo } from "react";
+import classes from "./{{name}}.module.scss";
+import clsx from "clsx";
+
+export type {{name}}Props = {
+	readonly className?: string | undefined;
+};
+
+export const {{name}}: FC<{{name}}Props> = memo(({ className }) => {
+	return <div className={clsx(className, classes.root)}></div>;
+});

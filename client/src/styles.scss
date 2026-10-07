@@ -1,0 +1,50 @@
+:root {
+	--spacing: 8px;
+	--radius: 16px;
+	--color-fg: rgb(125, 125, 128);
+	--color-bg: #334;
+	--input-color-fg: white;
+	--input-color-bg: rgb(80, 80, 106);
+	--input-color-bg-dark: #334;
+	--border-color: rgb(118, 118, 157);
+}
+
+body,
+html {
+	margin: 0;
+	padding: 0;
+	color: var(--color-fg);
+	background: var(--color-bg);
+  width: 100%;
+  height: 100%;
+}
+
+button {
+	padding: var(--spacing);
+	position: relative;
+	border-radius: var(--radius);
+	border-width: 1px;
+	border-style: outset;
+  font-weight: bold;
+  cursor: pointer;
+	color: var(--input-color-fg);
+	background-color: var(--input-color-bg);
+	background-image: linear-gradient(
+		-10deg,
+		var(--input-color-bg) 30%,
+		var(--input-color-bg-dark) 100%
+	);
+	border-color: var(--border-color);
+
+	&::after {
+		content: "";
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		border-radius: inherit;
+		box-shadow: inset 0 0 var(--spacing) var(--spacing) var(--input-color-bg-dark);
+		pointer-events: none;
+	}
+}

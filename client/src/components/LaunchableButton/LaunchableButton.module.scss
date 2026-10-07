@@ -1,0 +1,21 @@
+.root {
+	width: 200px;
+	height: 200px;
+	display: flex;
+	flex-direction: column;
+  overflow: hidden;
+}
+
+.icon {
+  flex: 1 1 0;
+  width: fit-content;
+  align-self: center;
+}
+
+.title {
+  flex: 0 0 auto;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+  margin-bottom: var(--spacing);
+}

@@ -1,0 +1,23 @@
+{
+	"name": "@repo/server",
+	"version": "1.0.0",
+	"description": "Express server",
+	"private": true,
+	"type": "module",
+	"engines": {
+		"node": ">=26"
+	},
+	"scripts": {
+		"dev": "node --watch --env-file-if-exists=../.env.defaults --env-file-if-exists=../.env src/main.ts",
+		"start": "node --env-file-if-exists=../.env.defaults --env-file-if-exists=../.env src/main.ts",
+		"typecheck": "tsc"
+	},
+	"dependencies": {
+		"@repo/shared": "*",
+		"express": "^5.2.1"
+	},
+	"devDependencies": {
+		"@types/express": "^5.0.0",
+		"@types/node": "^26.5.0"
+	}
+}
