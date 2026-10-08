@@ -1,4 +1,4 @@
-import type { DistributedOmit, Primitive, Tagged } from "type-fest";
+import type { Primitive, Tagged } from "type-fest";
 
 export type LaunchableID = Tagged<string, "LaunchableID">;
 
@@ -15,8 +15,6 @@ export type URLLaunchable = LaunchableBase<"URL"> & { readonly url: string };
 
 export type Launchable = AppLaunchable | ShellLaunchable | URLLaunchable;
 export type LaunchableType = Launchable["type"];
-
-export type NewLaunchable = DistributedOmit<Launchable, "id">;
 
 export type PrimitiveType =
 	"string" | "number" | "bigint" | "boolean" | "symbol" | "null" | "undefined";

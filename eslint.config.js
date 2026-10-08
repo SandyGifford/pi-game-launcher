@@ -83,6 +83,11 @@ export default [
 	{
 		files: ["client/**/*.{js,jsx,ts,tsx}"],
 		plugins: { "react-hooks": reactHooks },
+		settings: {
+			"react-hooks": {
+				additionalEffectHooks: "(usePromise)",
+			},
+		},
 		rules: {
 			"react-hooks/rules-of-hooks": "error",
 			"react-hooks/exhaustive-deps": "error",

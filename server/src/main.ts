@@ -1,7 +1,6 @@
-import { isLaunchableId, LAUNCHABLES_MAP } from "@repo/shared";
 import express from "express";
-import { CLIENT_DIR, STATIC_DIR } from "./consts.ts";
-import { launch } from "./utils.ts";
+import { CLIENT_DIR, LAUNCHABLES, LAUNCHABLES_MAP, STATIC_DIR } from "./consts.ts";
+import { isLaunchableId, launch } from "./utils.ts";
 
 const app = express();
 const port = Number(process.env["PORT"] ?? 3000);
@@ -28,6 +27,8 @@ app.post("/api/launch/:id", async (req, res) => {
 
 	await launch(launchable);
 });
+
+app.get("/api/launchables", async (req, res) => res.send(LAUNCHABLES));
 
 // icons and other static assets, then the built client (see client/vite.config.ts)
 app.use(express.static(STATIC_DIR));
