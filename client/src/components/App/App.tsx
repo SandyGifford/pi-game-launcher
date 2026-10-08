@@ -11,7 +11,7 @@ export type AppProps = {
 	readonly className?: string;
 };
 
-const BUTTON_THINK_DELAY_MS = 10000;
+const BUTTON_THINK_DELAY_MS = 3000;
 
 export const App: FC<AppProps> = memo(({ className }) => {
 	const { status, data } = usePromise(getLaunchables, []);
