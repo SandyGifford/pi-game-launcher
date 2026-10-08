@@ -2,12 +2,13 @@ import {
 	parseToPrimitive,
 	type Launchable,
 	type LaunchableID,
+	type LaunchAction,
 	type PrimitiveType,
 	type PrimitiveTypeMap,
 } from "@repo/shared";
 import { spawn } from "node:child_process";
 import { LAUNCHABLE_META, LAUNCHABLES_MAP } from "./consts.ts";
-import type { LaunchableLaunchAction, NewLaunchable } from "./types.ts";
+import type { NewLaunchable } from "./types.ts";
 
 export function getEnvironmentValue(name: string): string;
 export function getEnvironmentValue<TYPE extends PrimitiveType>(
@@ -44,7 +45,7 @@ export const launchProcess = (command: string, args: readonly string[]): Promise
 		});
 	});
 
-export const launch = async (launchable: Launchable): Promise<LaunchableLaunchAction> =>
+export const launch = async (launchable: Launchable): Promise<LaunchAction> =>
 	(await LAUNCHABLE_META[launchable.type].launch(launchable as never)) || { action: "none" };
 
 let lastId = 1;

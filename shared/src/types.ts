@@ -3,6 +3,10 @@ import type { Primitive, Tagged } from "type-fest";
 export type LaunchableID = Tagged<string, "LaunchableID">;
 export type LaunchableArguments = readonly string[];
 
+export type LaunchAction =
+	{ readonly action: "none" } | { readonly action: "redirect"; readonly url: string };
+export type LaunchActionType = LaunchAction["action"];
+
 type LaunchableBase<TYPE extends string> = {
 	readonly id: LaunchableID;
 	readonly type: TYPE;

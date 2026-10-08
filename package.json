@@ -13,7 +13,7 @@
 		"shared"
 	],
 	"scripts": {
-		"dev": "npm run dev -w @repo/server & npm run dev -w @repo/client",
+		"dev": "concurrently -k -n server,client \"npm run dev -w @repo/server\" \"npm run dev -w @repo/client\"",
 		"build": "npm run build -w @repo/client",
 		"start": "npm run start -w @repo/server",
 		"typecheck": "npm run typecheck --workspaces --if-present",
@@ -24,6 +24,7 @@
 	},
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",
+		"concurrently": "^10.0.6",
 		"eslint": "^10.10.0",
 		"eslint-plugin-react-hooks": "^7.1.1",
 		"prettier": "^3.9.6",

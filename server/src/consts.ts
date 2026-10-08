@@ -37,7 +37,7 @@ export const LAUNCHABLE_META: LaunchableMeta = {
 			launchProcess(getEnvironmentValue(appPath), launchArguments),
 	},
 	URL: {
-		launch: ({ url }) => ({ action: "redirect", url }),
+		launch: ({ url }) => ({ action: "redirect", url: getEnvironmentValue(url) }),
 	},
 	SHELL: {
 		launch: async ({ scriptPath, launchArguments = [] }) => {
