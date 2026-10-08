@@ -8,11 +8,16 @@ type LaunchableBase<TYPE extends string> = {
 	readonly type: TYPE;
 	readonly title: string;
 	readonly iconPath: string;
-	readonly launchArguments: LaunchableArguments;
 };
 
-export type AppLaunchable = LaunchableBase<"APP"> & { readonly appPath: string };
-export type ShellLaunchable = LaunchableBase<"SHELL"> & { readonly scriptPath: string };
+export type AppLaunchable = LaunchableBase<"APP"> & {
+	readonly appPath: string;
+	readonly launchArguments?: LaunchableArguments;
+};
+export type ShellLaunchable = LaunchableBase<"SHELL"> & {
+	readonly scriptPath: string;
+	readonly launchArguments?: LaunchableArguments;
+};
 export type URLLaunchable = LaunchableBase<"URL"> & { readonly url: string };
 
 export type Launchable = AppLaunchable | ShellLaunchable | URLLaunchable;

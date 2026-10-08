@@ -38,15 +38,14 @@ export const LAUNCHABLE_META: {
 	};
 } = {
 	APP: {
-		launch: ({ appPath, launchArguments }) =>
+		launch: ({ appPath, launchArguments = [] }) =>
 			launchProcess(getEnvironmentValue(appPath), launchArguments),
 	},
 	URL: {
-		launch: ({ url, launchArguments }) =>
-			launchProcess("chromium", ["--kiosk", getEnvironmentValue(url), ...launchArguments]),
+		launch: ({ url }) => launchProcess("chromium", ["--kiosk", getEnvironmentValue(url)]),
 	},
 	SHELL: {
-		launch: async ({ scriptPath, launchArguments }) => {
+		launch: async ({ scriptPath, launchArguments = [] }) => {
 			const configuredScriptPath = getEnvironmentValue(scriptPath);
 			const absoluteScriptPath = await realpath(resolve(SHELL_SCRIPTS_DIR, configuredScriptPath));
 

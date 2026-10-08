@@ -51,10 +51,9 @@ export const launch = async (launchable: Launchable): Promise<void> => {
 
 let lastId = 1;
 export const processLaunchables = (launchables: readonly NewLaunchable[]): readonly Launchable[] =>
-	launchables.map(({ launchArguments = [], ...rest }) => ({
-		...rest,
+	launchables.map((launchable) => ({
+		...launchable,
 		id: `${lastId++}` as LaunchableID,
-		launchArguments,
 	}));
 
 export const isLaunchableId = (id: unknown): id is LaunchableID => {
