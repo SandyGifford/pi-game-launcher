@@ -1,4 +1,4 @@
-import type { Primitive, Tagged } from "type-fest";
+import type { ConditionalPick, Primitive, Tagged } from "type-fest";
 
 export type LaunchableID = Tagged<string, "LaunchableID">;
 export type LaunchableArguments = readonly string[];
@@ -44,3 +44,14 @@ export type PrimitiveTypeMap = Satisfies<
 		readonly undefined: undefined;
 	}
 >;
+
+export type Fn = (...args: readonly never[]) => unknown;
+export type PromisifyHandler<FN extends Fn> = (
+	...args: Parameters<FN>
+) => ReturnType<FN> | Promise<ReturnType<FN>>;
+export type PromisifyProps<
+	P extends object,
+	K extends keyof P & keyof ConditionalPick<P, Fn | undefined>,
+> = Omit<P, K> & {
+	readonly [KEY in K]?: PromisifyHandler<Extract<NonNullable<P[KEY]>, Fn>>;
+};
