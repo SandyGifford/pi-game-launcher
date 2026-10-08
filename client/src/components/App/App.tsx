@@ -14,14 +14,17 @@ export const App: FC<AppProps> = memo(({ className }) => {
 	const { status, data } = usePromise(getLaunchables, []);
 
 	return (
-		<div className={clsx(className, classes.root, status === "loading" && classes["root--loading"])}>
+		<div
+			className={clsx(className, classes.root, status === "loading" && classes["root--loading"])}
+		>
 			<div className={classes.launchables}>
 				{(() => {
 					switch (status) {
 						case "data":
-							return data.map((launchable) => (
+							return data.map((launchable, i) => (
 								<LaunchableButton
 									className={classes.launchable}
+									permaThink
 									key={launchable.id}
 									launchable={launchable}
 								/>

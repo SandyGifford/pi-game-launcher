@@ -1,0 +1,27 @@
+// Registrations for the properties used by `button-background`. Import this
+// once globally (styles.scss) so they can be animated and transitioned.
+// initial-value must be a literal; the real defaults are set by the mixin.
+
+@property --button-background-light {
+	syntax: "<color>";
+	initial-value: rgb(80, 80, 106);
+	inherits: false;
+}
+
+@property --button-background-dark {
+	syntax: "<color>";
+	initial-value: rgb(51, 51, 68);
+	inherits: false;
+}
+
+@property --button-background-rotate {
+	syntax: "<angle>";
+	initial-value: -10deg;
+	inherits: false;
+}
+
+@property --button-background-inset {
+	syntax: "<percentage>";
+	initial-value: 30%;
+	inherits: false;
+}

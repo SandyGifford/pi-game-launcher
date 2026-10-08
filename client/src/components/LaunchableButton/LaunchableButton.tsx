@@ -4,17 +4,16 @@ import type { FC } from "react";
 import { memo } from "react";
 import classes from "./LaunchableButton.module.scss";
 import { launch } from "../../api";
-import { AsyncButton } from "../AsyncButton/AsyncButton";
+import { AsyncButton, type AsyncButtonProps } from "../AsyncButton/AsyncButton";
 
 export type LaunchableButtonProps = {
-	readonly className?: string | undefined;
 	readonly launchable: Launchable;
-};
+} & AsyncButtonProps;
 
 export const LaunchableButton: FC<LaunchableButtonProps> = memo(
-	({ className, launchable: { id, iconPath, title } }) => {
+	({ className, launchable: { id, iconPath, title }, ...rest }) => {
 		return (
-			<AsyncButton className={clsx(className, classes.root)} onClick={() => launch(id)}>
+			<AsyncButton className={clsx(className, classes.root)} onClick={() => launch(id)} {...rest}>
 				<img className={classes.icon} src={`/icons/${iconPath}`} />
 				<span className={classes.title}>{title}</span>
 			</AsyncButton>

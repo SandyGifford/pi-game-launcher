@@ -1,3 +1,6 @@
+@import "./mixins.setup.scss";
+@import "./mixins.scss";
+
 :root {
 	--spacing: 8px;
 	--radius: 16px;
@@ -6,6 +9,7 @@
 	--input-color-fg: white;
 	--input-color-bg: rgb(80, 80, 106);
 	--input-color-bg-dark: #334;
+	--input-color-bg-extra-dark: rgb(13, 13, 19);
 	--border-color: rgb(118, 118, 157);
 }
 
@@ -15,25 +19,21 @@ html {
 	padding: 0;
 	color: var(--color-fg);
 	background: var(--color-bg);
-  width: 100%;
-  height: 100%;
+	width: 100%;
+	height: 100%;
 }
 
 button {
+	@include button-background;
+
 	padding: var(--spacing);
 	position: relative;
 	border-radius: var(--radius);
 	border-width: 1px;
 	border-style: outset;
-  font-weight: bold;
-  cursor: pointer;
+	font-weight: bold;
+	cursor: pointer;
 	color: var(--input-color-fg);
-	background-color: var(--input-color-bg);
-	background-image: linear-gradient(
-		-10deg,
-		var(--input-color-bg) 30%,
-		var(--input-color-bg-dark) 100%
-	);
 	border-color: var(--border-color);
 
 	&::after {
