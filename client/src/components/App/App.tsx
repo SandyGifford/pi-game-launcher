@@ -24,7 +24,7 @@ export const App: FC<AppProps> = memo(({ className }) => {
 							return data.map((launchable, i) => (
 								<LaunchableButton
 									className={classes.launchable}
-									permaThink
+									permaThink={10000}
 									key={launchable.id}
 									launchable={launchable}
 								/>
