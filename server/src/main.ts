@@ -25,7 +25,7 @@ app.post("/api/launch/:id", async (req, res) => {
 		return;
 	}
 
-	await launch(launchable);
+	res.send(await launch(launchable));
 });
 
 app.get("/api/launchables", async (req, res) => res.send(LAUNCHABLES));

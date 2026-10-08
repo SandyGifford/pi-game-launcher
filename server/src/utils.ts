@@ -7,7 +7,7 @@ import {
 } from "@repo/shared";
 import { spawn } from "node:child_process";
 import { LAUNCHABLE_META, LAUNCHABLES_MAP } from "./consts.ts";
-import type { NewLaunchable } from "./types.ts";
+import type { LaunchableLaunchAction, NewLaunchable } from "./types.ts";
 
 export function getEnvironmentValue(name: string): string;
 export function getEnvironmentValue<TYPE extends PrimitiveType>(
@@ -44,13 +44,13 @@ export const launchProcess = (command: string, args: readonly string[]): Promise
 		});
 	});
 
-export const launch = async (launchable: Launchable): Promise<void> => {
-	const { type } = launchable;
-	await LAUNCHABLE_META[type].launch(launchable as never);
-};
+export const launch = async (launchable: Launchable): Promise<LaunchableLaunchAction> =>
+	(await LAUNCHABLE_META[launchable.type].launch(launchable as never)) || { action: "none" };
 
 let lastId = 1;
-export const processNewLaunchables = (launchables: readonly NewLaunchable[]): readonly Launchable[] =>
+export const processNewLaunchables = (
+	launchables: readonly NewLaunchable[]
+): readonly Launchable[] =>
 	launchables.map((launchable) => ({
 		...launchable,
 		id: `${lastId++}` as LaunchableID,

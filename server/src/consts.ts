@@ -1,7 +1,8 @@
-import type { Launchable, LaunchableID, LaunchableType } from "@repo/shared";
+import type { Launchable, LaunchableID } from "@repo/shared";
 import { realpath, stat } from "node:fs/promises";
 import { resolve } from "node:path";
-import { processNewLaunchables, getEnvironmentValue, launchProcess } from "./utils.ts";
+import type { LaunchableMeta } from "./types.ts";
+import { getEnvironmentValue, launchProcess, processNewLaunchables } from "./utils.ts";
 
 export const ROOT_DIR = resolve(import.meta.dirname, "../../");
 export const SERVER_DIR = resolve(ROOT_DIR, "server");
@@ -30,19 +31,13 @@ export const LAUNCHABLES_MAP = LAUNCHABLES.reduce(
 	{} as { readonly [ID in LaunchableID]: Launchable }
 );
 
-export const LAUNCHABLE_META: {
-	readonly [TYPE in LaunchableType]: {
-		readonly launch: (
-			launchable: Extract<Launchable, { readonly type: TYPE }>
-		) => unknown | Promise<unknown>;
-	};
-} = {
+export const LAUNCHABLE_META: LaunchableMeta = {
 	APP: {
 		launch: ({ appPath, launchArguments = [] }) =>
 			launchProcess(getEnvironmentValue(appPath), launchArguments),
 	},
 	URL: {
-		launch: ({ url }) => launchProcess("chromium", ["--kiosk", getEnvironmentValue(url)]),
+		launch: ({ url }) => ({ action: "redirect", url }),
 	},
 	SHELL: {
 		launch: async ({ scriptPath, launchArguments = [] }) => {
