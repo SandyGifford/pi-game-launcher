@@ -11,9 +11,16 @@ export type LaunchableButtonProps = {
 } & AsyncButtonProps;
 
 export const LaunchableButton: FC<LaunchableButtonProps> = memo(
-	({ className, launchable: { id, iconPath, title }, ...rest }) => {
+	({ className, launchable: { id, iconPath, title }, onClick, ...rest }) => {
 		return (
-			<AsyncButton className={clsx(className, classes.root)} onClick={() => launch(id)} {...rest}>
+			<AsyncButton
+				className={clsx(className, classes.root)}
+				onClick={async (e) => {
+					await launch(id);
+					await onClick?.(e);
+				}}
+				{...rest}
+			>
 				<img className={classes.icon} src={`/icons/${iconPath}`} />
 				<span className={classes.title}>{title}</span>
 			</AsyncButton>
