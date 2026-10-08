@@ -1,12 +1,14 @@
 import type { Primitive, Tagged } from "type-fest";
 
 export type LaunchableID = Tagged<string, "LaunchableID">;
+export type LaunchableArguments = readonly string[];
 
 type LaunchableBase<TYPE extends string> = {
 	readonly id: LaunchableID;
 	readonly type: TYPE;
 	readonly title: string;
 	readonly iconPath: string;
+	readonly launchArguments: LaunchableArguments;
 };
 
 export type AppLaunchable = LaunchableBase<"APP"> & { readonly appPath: string };
@@ -24,12 +26,12 @@ export type Satisfies<T, U extends T> = U;
 export type PrimitiveTypeMap = Satisfies<
 	{ readonly [TYPE in PrimitiveType]: Primitive },
 	{
-		string: string;
-		number: number;
-		bigint: bigint;
-		boolean: boolean;
-		symbol: symbol;
-		null: null;
-		undefined: undefined;
+		readonly string: string;
+		readonly number: number;
+		readonly bigint: bigint;
+		readonly boolean: boolean;
+		readonly symbol: symbol;
+		readonly null: null;
+		readonly undefined: undefined;
 	}
 >;

@@ -49,10 +49,13 @@ export const launch = async (launchable: Launchable): Promise<void> => {
 	await LAUNCHABLE_META[type].launch(launchable as never);
 };
 
-let id = 1;
-
-export const addLaunchableIds = (launchables: readonly NewLaunchable[]): readonly Launchable[] =>
-	launchables.map((launchable) => ({ ...launchable, id: `${id++}` }) as Launchable);
+let lastId = 1;
+export const processLaunchables = (launchables: readonly NewLaunchable[]): readonly Launchable[] =>
+	launchables.map(({ launchArguments = [], ...rest }) => ({
+		...rest,
+		id: `${lastId++}` as LaunchableID,
+		launchArguments,
+	}));
 
 export const isLaunchableId = (id: unknown): id is LaunchableID => {
 	if (typeof id !== "string") return false;
