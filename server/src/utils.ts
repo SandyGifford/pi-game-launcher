@@ -6,8 +6,8 @@ import {
 	type PrimitiveType,
 	type PrimitiveTypeMap,
 } from "@repo/shared";
-import { spawn } from "node:child_process";
-import { LAUNCHABLE_META, LAUNCHABLES_MAP } from "./consts.ts";
+import { spawn, type ChildProcess, type SpawnOptions } from "node:child_process";
+import { LAUNCHABLE_META, LAUNCHABLES_MAP, ROOT_DIR } from "./consts.ts";
 import type { NewLaunchable } from "./types.ts";
 
 export function getEnvironmentValue(name: string): string;
@@ -31,19 +31,46 @@ export function getEnvironmentValue(
 	}
 }
 
-export const launchProcess = (command: string, args: readonly string[]): Promise<void> =>
-	new Promise((resolveLaunch, rejectLaunch) => {
-		const child = spawn(command, args, {
-			detached: true,
-			stdio: "ignore",
-		});
+export type ProcessResult = {
+	readonly stdout: string;
+	readonly stderr: string;
+	readonly code: number | null;
+};
 
-		child.once("error", rejectLaunch);
-		child.once("spawn", () => {
-			child.unref();
-			resolveLaunch();
-		});
+const spawnChild = (command: string, args: readonly string[], options: SpawnOptions) =>
+	new Promise<ChildProcess>((resolveSpawn, rejectSpawn) => {
+		const child = spawn(command, args, { cwd: ROOT_DIR, ...options });
+
+		child.once("error", rejectSpawn);
+		child.once("spawn", () => resolveSpawn(child));
 	});
+
+export const launchProcessDetached = async (
+	command: string,
+	args: readonly string[],
+	options?: Omit<SpawnOptions, "stdio" | "detached">
+): Promise<void> => {
+	const child = await spawnChild(command, args, { detached: true, stdio: "ignore", ...options });
+	child.unref();
+};
+
+export const launchProcess = async (
+	command: string,
+	args: readonly string[],
+	options?: Omit<SpawnOptions, "stdio">
+): Promise<ProcessResult> => {
+	const child = await spawnChild(command, args, { stdio: ["ignore", "pipe", "pipe"], ...options });
+
+	return new Promise((resolveResult, rejectResult) => {
+		let stdout = "";
+		let stderr = "";
+
+		child.stdout?.setEncoding("utf8").on("data", (chunk: string) => (stdout += chunk));
+		child.stderr?.setEncoding("utf8").on("data", (chunk: string) => (stderr += chunk));
+		child.once("error", rejectResult);
+		child.once("close", (code) => resolveResult({ stdout, stderr, code }));
+	});
+};
 
 export const launch = async (launchable: Launchable): Promise<LaunchAction> =>
 	(await LAUNCHABLE_META[launchable.type].launch(launchable as never)) || { action: "none" };
