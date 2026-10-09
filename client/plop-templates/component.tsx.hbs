@@ -8,5 +8,5 @@ export type {{name}}Props = {
 };
 
 export const {{name}}: FC<{{name}}Props> = memo(({ className }) => {
-	return <div className={clsx(className, classes.root)}></div>;
+	return <div className={"{{name}}", clsx(className, classes.root)}></div>;
 });

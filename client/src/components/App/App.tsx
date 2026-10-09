@@ -1,11 +1,10 @@
-import { type LaunchableID } from "@repo/shared";
 import clsx from "clsx";
 import type { FC } from "react";
 import { memo, useState } from "react";
 import { getLaunchables, needsUpdate, updateAndReload } from "../../api";
 import { usePromise, useWindowHandler } from "../../hooks";
-import { AsyncButton } from "../AsyncButton/AsyncButton";
 import { LaunchableButton } from "../LaunchableButton/LaunchableButton";
+import { OtherButton } from "../OtherButton/OtherButton";
 import classes from "./App.module.scss";
 
 export type AppProps = {
@@ -16,14 +15,18 @@ export const App: FC<AppProps> = memo(({ className }) => {
 	const { status, data } = usePromise(getLaunchables, []);
 	const { data: updateAvailable } = usePromise(needsUpdate, []);
 
-	const [thinkingBtn, setThinkingBtn] = useState<LaunchableID | "UPDATE_AVAILABLE">();
-	const thinking = !!thinkingBtn;
+	const [thinkingID, setThinkingID] = useState<string>();
 
-	useWindowHandler(() => setThinkingBtn(undefined), [], "focus");
+	useWindowHandler(() => setThinkingID(undefined), [], "focus");
 
 	return (
 		<div
-			className={clsx(className, classes.root, status === "loading" && classes["root--loading"])}
+			className={clsx(
+				"App",
+				className,
+				classes.root,
+				status === "loading" && classes["root--loading"]
+			)}
 		>
 			<div className={classes.launchables}>
 				{(() => {
@@ -31,12 +34,11 @@ export const App: FC<AppProps> = memo(({ className }) => {
 						case "data":
 							return data.map((launchable) => (
 								<LaunchableButton
-									className={classes.launchable}
-									onThinkingChange={(thinking) => thinking && setThinkingBtn(launchable.id)}
-									disabled={thinking}
-									forceThinking={thinkingBtn === launchable.id}
 									key={launchable.id}
+									className={classes.launchable}
 									launchable={launchable}
+									currentThinkingId={thinkingID}
+									setCurrentThinkingId={setThinkingID}
 								/>
 							));
 						default:
@@ -44,16 +46,24 @@ export const App: FC<AppProps> = memo(({ className }) => {
 					}
 				})()}
 			</div>
-			<div className={clsx(classes.other, !updateAvailable && classes["other--hidden"])}>
-				<AsyncButton
+			<div className={clsx(classes.others, !updateAvailable && classes["other--hidden"])}>
+				<OtherButton
+					thinkingId="UPDATE_AVAILABLE"
+					currentThinkingId={thinkingID}
+					setCurrentThinkingId={setThinkingID}
 					onClick={async () => {
 						await updateAndReload();
 					}}
-					disabled={thinking}
-					forceThinking={thinkingBtn === "UPDATE_AVAILABLE"}
 				>
 					update available!
-				</AsyncButton>
+				</OtherButton>
+				<OtherButton
+					currentThinkingId={thinkingID}
+					setCurrentThinkingId={setThinkingID}
+					onClick={async () => {}}
+				>
+					configure
+				</OtherButton>
 			</div>
 		</div>
 	);

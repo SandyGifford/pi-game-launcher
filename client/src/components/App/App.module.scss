@@ -15,13 +15,14 @@
 	gap: fn.spacing(4);
 }
 
-.other {
-	transition: fn.transition(height, opacity);
-	height: 48px;
-	opacity: 1;
+.others {
+	display: flex;
 
-	&--hidden {
-		height: 0;
-		opacity: 0;
+	:global(.OtherButton) {
+		margin-left: fn.spacing(2);
+
+		&:first-child {
+			margin-left: 0;
+		}
 	}
 }

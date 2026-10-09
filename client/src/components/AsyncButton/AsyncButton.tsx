@@ -28,6 +28,7 @@ export const AsyncButton: FC<AsyncButtonProps> = memo(
 		forceThinking,
 		permaThink,
 		onThinkingChange,
+		children,
 		...rest
 	}) => {
 		const { inUse: thinking, reserveWhile: thinkWhile } = useInUse({
@@ -45,7 +46,12 @@ export const AsyncButton: FC<AsyncButtonProps> = memo(
 
 		return (
 			<button
-				className={clsx(className, classes.root, thinking && classes["root--thinking"])}
+				className={clsx(
+					"AsyncButton",
+					className,
+					classes.root,
+					thinking && classes["root--thinking"]
+				)}
 				disabled={disabled || thinking}
 				onClick={handlePromisifiedHandler(onClick)}
 				onMouseDown={handlePromisifiedHandler(onMouseDown)}
@@ -53,7 +59,9 @@ export const AsyncButton: FC<AsyncButtonProps> = memo(
 				onTouchStart={handlePromisifiedHandler(onTouchStart)}
 				onTouchEnd={handlePromisifiedHandler(onTouchEnd)}
 				{...rest}
-			></button>
+			>
+				{children}
+			</button>
 		);
 	}
 );
