@@ -6,6 +6,7 @@ import { usePromise, useWindowHandler } from "../../hooks";
 import { LaunchableButton } from "../LaunchableButton/LaunchableButton";
 import { OtherButton } from "../OtherButton/OtherButton";
 import classes from "./App.module.scss";
+import { TransitionGroup } from "react-transition-group";
 
 export type AppProps = {
 	readonly className?: string;
@@ -46,25 +47,29 @@ export const App: FC<AppProps> = memo(({ className }) => {
 					}
 				})()}
 			</div>
-			<div className={clsx(classes.others, !updateAvailable && classes["other--hidden"])}>
+			<TransitionGroup className={classes.others}>
+				{updateAvailable && (
+					<OtherButton
+						key="update-available"
+						thinkingId="UPDATE_AVAILABLE"
+						currentThinkingId={thinkingID}
+						setCurrentThinkingId={setThinkingID}
+						onClick={async () => {
+							await updateAndReload();
+						}}
+					>
+						update available!
+					</OtherButton>
+				)}
 				<OtherButton
-					thinkingId="UPDATE_AVAILABLE"
-					currentThinkingId={thinkingID}
-					setCurrentThinkingId={setThinkingID}
-					onClick={async () => {
-						await updateAndReload();
-					}}
-				>
-					update available!
-				</OtherButton>
-				<OtherButton
+					key="configure"
 					currentThinkingId={thinkingID}
 					setCurrentThinkingId={setThinkingID}
 					onClick={async () => {}}
 				>
 					configure
 				</OtherButton>
-			</div>
+			</TransitionGroup>
 		</div>
 	);
 });

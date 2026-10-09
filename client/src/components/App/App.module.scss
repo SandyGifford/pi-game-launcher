@@ -17,12 +17,4 @@
 
 .others {
 	display: flex;
-
-	:global(.OtherButton) {
-		margin-left: fn.spacing(2);
-
-		&:first-child {
-			margin-left: 0;
-		}
-	}
 }

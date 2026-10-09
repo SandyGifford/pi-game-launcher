@@ -1,4 +1,29 @@
 @use "../../fn.scss";
 
 .root {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	opacity: 1;
+	transition: fn.transition(grid-template-columns, opacity, margin, transform);
+	justify-items: center;
+	margin: fn.spacing(0, 1);
+
+	&.root--enter,
+	&.root--exit-active,
+	&.root--exit-done {
+		grid-template-columns: minmax(0, 0fr);
+		margin: 0;
+		opacity: 0;
+		transform: translateY(fn.spacing(3));
+	}
+
+	&.root--enter-active {
+		grid-template-columns: minmax(0, 1fr);
+		opacity: 1;
+		transform: none;
+	}
+}
+
+.button {
+	width: max-content;
 }
