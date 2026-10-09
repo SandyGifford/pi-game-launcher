@@ -7,6 +7,7 @@ import { LaunchableButton } from "../LaunchableButton/LaunchableButton";
 import { OtherButton } from "../OtherButton/OtherButton";
 import classes from "./App.module.scss";
 import { TransitionGroup } from "react-transition-group";
+import { awaitTime } from "@repo/shared";
 
 export type AppProps = {
 	readonly className?: string;
@@ -14,7 +15,11 @@ export type AppProps = {
 
 export const App: FC<AppProps> = memo(({ className }) => {
 	const { status, data } = usePromise(getLaunchables, []);
-	const { data: updateAvailable } = usePromise(needsUpdate, []);
+	const { data: updateAvailable } = usePromise(async () => {
+		// delay update button so it grabs attention by popping in
+		await awaitTime(1000);
+		return await needsUpdate();
+	}, []);
 
 	const [thinkingID, setThinkingID] = useState<string>();
 
