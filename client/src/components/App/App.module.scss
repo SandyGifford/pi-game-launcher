@@ -1,13 +1,27 @@
+@use "../../fn.scss";
+
 .root {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-  width: 100vw;
-  height: 100vh;
+	width: 100vw;
+	height: 100vh;
+	gap: fn.spacing(5);
 }
 
 .launchables {
 	display: flex;
-	gap: calc(var(--spacing) * 4);
+	gap: fn.spacing(4);
+}
+
+.other {
+	transition: fn.transition(height, opacity);
+	height: 48px;
+	opacity: 1;
+
+	&--hidden {
+		height: 0;
+		opacity: 0;
+	}
 }

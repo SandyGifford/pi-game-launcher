@@ -1,0 +1,25 @@
+@use "sass:list";
+
+@function spacing($ns...) {
+	@if list.length($ns) == 0 {
+		$ns: (1);
+	}
+
+	$list: ();
+
+	@each $n in $ns {
+		$list: list.append($list, calc(var(--spacing) * $n));
+	}
+
+	@return $list;
+}
+
+@function transition($props...) {
+	$list: ();
+
+	@each $prop in $props {
+		$list: list.append($list, $prop 500ms, $separator: "comma");
+	}
+
+	@return $list;
+}

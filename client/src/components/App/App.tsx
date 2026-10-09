@@ -1,9 +1,10 @@
-import type { LaunchableID } from "@repo/shared";
+import { type LaunchableID } from "@repo/shared";
 import clsx from "clsx";
 import type { FC } from "react";
-import { memo, useMemo, useState } from "react";
-import { getLaunchables } from "../../api";
+import { memo, useState } from "react";
+import { getLaunchables, needsUpdate, updateAndReload } from "../../api";
 import { usePromise, useWindowHandler } from "../../hooks";
+import { AsyncButton } from "../AsyncButton/AsyncButton";
 import { LaunchableButton } from "../LaunchableButton/LaunchableButton";
 import classes from "./App.module.scss";
 
@@ -13,14 +14,12 @@ export type AppProps = {
 
 export const App: FC<AppProps> = memo(({ className }) => {
 	const { status, data } = usePromise(getLaunchables, []);
+	const { data: updateAvailable } = usePromise(needsUpdate, []);
 
-	const [thinkingMap, setThinkingMap] = useState<{ readonly [ID in LaunchableID]: boolean }>({});
-	const thinking = useMemo(
-		() => Object.values(thinkingMap).some((thinking) => thinking),
-		[thinkingMap]
-	);
+	const [thinkingBtn, setThinkingBtn] = useState<LaunchableID | "UPDATE_AVAILABLE">();
+	const thinking = !!thinkingBtn;
 
-	useWindowHandler(() => setThinkingMap({}), [], "focus");
+	useWindowHandler(() => setThinkingBtn(undefined), [], "focus");
 
 	return (
 		<div
@@ -33,14 +32,9 @@ export const App: FC<AppProps> = memo(({ className }) => {
 							return data.map((launchable) => (
 								<LaunchableButton
 									className={classes.launchable}
-									onThinkingChange={(thinking) =>
-										setThinkingMap((thinkingMap) =>
-											thinking ? { ...thinkingMap, [launchable.id]: thinking } : thinkingMap
-										)
-									}
+									onThinkingChange={(thinking) => thinking && setThinkingBtn(launchable.id)}
 									disabled={thinking}
-									// once an ID is marked as thinking, keep it thinking until the window blurs
-									forceThinking={thinkingMap[launchable.id]}
+									forceThinking={thinkingBtn === launchable.id}
 									key={launchable.id}
 									launchable={launchable}
 								/>
@@ -49,6 +43,17 @@ export const App: FC<AppProps> = memo(({ className }) => {
 							return;
 					}
 				})()}
+			</div>
+			<div className={clsx(classes.other, !updateAvailable && classes["other--hidden"])}>
+				<AsyncButton
+					onClick={async () => {
+						await updateAndReload();
+					}}
+					disabled={thinking}
+					forceThinking={thinkingBtn === "UPDATE_AVAILABLE"}
+				>
+					update available!
+				</AsyncButton>
 			</div>
 		</div>
 	);

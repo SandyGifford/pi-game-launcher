@@ -1,9 +1,12 @@
+@use "../../fn.scss";
+
 .root {
 	width: 200px;
 	height: 200px;
 	display: flex;
 	flex-direction: column;
   overflow: hidden;
+  padding: fn.spacing();
 }
 
 .icon {
@@ -17,5 +20,5 @@
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
-  margin-bottom: var(--spacing);
+  margin-bottom: fn.spacing();
 }

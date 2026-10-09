@@ -13,3 +13,5 @@ export const toError = (error: unknown): Error => {
 		return new Error((error as { message: string }).message);
 	return new Error(`unknown error: ${String(error)}`);
 };
+
+export const awaitTime = (ms: number) => new Promise((res) => setTimeout(res, ms));
