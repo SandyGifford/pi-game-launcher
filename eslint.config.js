@@ -85,7 +85,7 @@ export default [
 		plugins: { "react-hooks": reactHooks },
 		settings: {
 			"react-hooks": {
-				additionalEffectHooks: "(usePromise)",
+				additionalEffectHooks: "(usePromise|useWindowHandler)",
 			},
 		},
 		rules: {

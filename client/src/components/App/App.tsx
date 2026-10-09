@@ -3,15 +3,13 @@ import clsx from "clsx";
 import type { FC } from "react";
 import { memo, useMemo, useState } from "react";
 import { getLaunchables } from "../../api";
-import { usePromise } from "../../hooks";
+import { usePromise, useWindowHandler } from "../../hooks";
 import { LaunchableButton } from "../LaunchableButton/LaunchableButton";
 import classes from "./App.module.scss";
 
 export type AppProps = {
 	readonly className?: string;
 };
-
-const BUTTON_THINK_DELAY_MS = 3000;
 
 export const App: FC<AppProps> = memo(({ className }) => {
 	const { status, data } = usePromise(getLaunchables, []);
@@ -21,6 +19,8 @@ export const App: FC<AppProps> = memo(({ className }) => {
 		() => Object.values(thinkingMap).some((thinking) => thinking),
 		[thinkingMap]
 	);
+
+	useWindowHandler(() => setThinkingMap({}), [], "focus");
 
 	return (
 		<div
@@ -34,10 +34,13 @@ export const App: FC<AppProps> = memo(({ className }) => {
 								<LaunchableButton
 									className={classes.launchable}
 									onThinkingChange={(thinking) =>
-										setThinkingMap((thinkingMap) => ({ ...thinkingMap, [launchable.id]: thinking }))
+										setThinkingMap((thinkingMap) =>
+											thinking ? { ...thinkingMap, [launchable.id]: thinking } : thinkingMap
+										)
 									}
 									disabled={thinking}
-									permaThink={BUTTON_THINK_DELAY_MS}
+									// once an ID is marked as thinking, keep it thinking until the window blurs
+									forceThinking={thinkingMap[launchable.id]}
 									key={launchable.id}
 									launchable={launchable}
 								/>
