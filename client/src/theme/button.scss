@@ -2,13 +2,13 @@
 
 @property --button-background-light {
 	syntax: "<color>";
-	initial-value: rgb(80, 80, 106);
+	initial-value: var(--input-color-bg);
 	inherits: false;
 }
 
 @property --button-background-dark {
 	syntax: "<color>";
-	initial-value: rgb(51, 51, 68);
+	initial-value: var(--input-color-bg-dark);
 	inherits: false;
 }
 
