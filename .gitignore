@@ -12,9 +12,6 @@ yarn-error.log*
 dist/
 coverage/
 
-# Built client
-server/static/client/
-
 # Environment variables (.env holds local overrides)
 .env
 

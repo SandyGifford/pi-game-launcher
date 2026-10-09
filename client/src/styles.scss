@@ -1,6 +1,3 @@
-@import "./mixins.setup.scss";
-@import "./mixins.scss";
-
 :root {
 	--spacing: 8px;
 	--radius: 16px;
@@ -23,8 +20,44 @@ html {
 	height: 100%;
 }
 
+// Registrations for the properties used by `button-background`. Import this
+// once globally (styles.scss) so they can be animated and transitioned.
+// initial-value must be a literal; the real defaults are set by the mixin.
+
+@property --button-background-light {
+	syntax: "<color>";
+	initial-value: rgb(80, 80, 106);
+	inherits: false;
+}
+
+@property --button-background-dark {
+	syntax: "<color>";
+	initial-value: rgb(51, 51, 68);
+	inherits: false;
+}
+
+@property --button-background-rotate {
+	syntax: "<angle>";
+	initial-value: -10deg;
+	inherits: false;
+}
+
+@property --button-background-inset {
+	syntax: "<percentage>";
+	initial-value: 30%;
+	inherits: false;
+}
+
 button {
-	@include button-background;
+	--button-background-light: var(--input-color-bg);
+	--button-background-dark: var(--input-color-bg-dark);
+
+	background-color: var(--button-background-light);
+	background-image: linear-gradient(
+		var(--button-background-rotate),
+		var(--button-background-light) var(--button-background-inset),
+		var(--button-background-dark) 100%
+	);
 
 	padding: var(--spacing);
 	position: relative;
