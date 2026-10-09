@@ -1,0 +1,61 @@
+@use "../fn.scss";
+
+@property --button-background-light {
+	syntax: "<color>";
+	initial-value: rgb(80, 80, 106);
+	inherits: false;
+}
+
+@property --button-background-dark {
+	syntax: "<color>";
+	initial-value: rgb(51, 51, 68);
+	inherits: false;
+}
+
+@property --button-background-rotate {
+	syntax: "<angle>";
+	initial-value: -10deg;
+	inherits: false;
+}
+
+@property --button-background-inset {
+	syntax: "<percentage>";
+	initial-value: 30%;
+	inherits: false;
+}
+
+button {
+	--button-background-light: var(--input-color-bg);
+	--button-background-dark: var(--input-color-bg-dark);
+
+	background-color: var(--button-background-light);
+	background-image: linear-gradient(
+		var(--button-background-rotate),
+		var(--button-background-light) var(--button-background-inset),
+		var(--button-background-dark) 100%
+	);
+
+	min-height: 48px;
+
+	padding: fn.spacing(1, 2);
+	position: relative;
+	border-radius: var(--radius);
+	border-width: 1px;
+	border-style: outset;
+	font-weight: bold;
+	cursor: pointer;
+	color: var(--input-color-fg);
+	border-color: var(--border-color);
+
+	&::after {
+		content: "";
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		border-radius: inherit;
+		box-shadow: inset 0 0 fn.spacing() fn.spacing() var(--input-color-bg-dark);
+		pointer-events: none;
+	}
+}
