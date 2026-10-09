@@ -14,19 +14,24 @@ export type HomepageProps = {
 };
 
 export const Homepage: FC<HomepageProps> = memo(({ className }) => {
-	const { status, data } = usePromise(getLaunchables, []);
-	const { data: updateAvailable } = usePromise(async () => {
+	const { status, data } = usePromise(
+		async () => (await Promise.all([awaitTime(1000), getLaunchables()]))[1],
+		[]
+	);
+	const { data: updateAvailable } = usePromise(
 		// delay update button so it grabs attention by popping in
-		await awaitTime(1000);
-		return await needsUpdate();
-	}, []);
+		async () => (await Promise.all([awaitTime(2000), needsUpdate()]))[1],
+		[]
+	);
+
+	const isReady = status === "data";
 
 	const [thinkingID, setThinkingID] = useState<string>();
 
 	useWindowHandler(() => setThinkingID(undefined), [], "focus");
 
 	return (
-		<div className={clsx("Homepage", className, classes.root)}>
+		<div className={clsx("Homepage", className, classes.root, isReady && classes["root--ready"])}>
 			<div className={classes.launchables}>
 				{(() => {
 					switch (status) {

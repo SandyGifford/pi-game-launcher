@@ -1,5 +1,11 @@
 @use "../../fn.scss";
 
+@mixin ready {
+	.root--ready & {
+		@content;
+	}
+}
+
 .root {
 	display: flex;
 	flex-direction: column;
@@ -13,8 +19,27 @@
 .launchables {
 	display: flex;
 	gap: fn.spacing(4);
+	transition: fn.transition(opacity, transform);
+	opacity: 0;
+	transform: scale(2);
+	transform-origin: 50% calc(100% + var(--spacing) * 2.5);
+
+	@include ready {
+		transform: scale(1);
+		opacity: 1;
+	}
 }
 
 .others {
 	display: flex;
+	transition: fn.transition(opacity, transform);
+	opacity: 0;
+	transform: scale(2);
+	transition-delay: 200ms;
+	transform-origin: 50% calc(var(--spacing) * -2.5);
+
+	@include ready {
+		transform: scale(1);
+		opacity: 1;
+	}
 }
