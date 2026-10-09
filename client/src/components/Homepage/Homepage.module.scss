@@ -1,0 +1,20 @@
+@use "../../fn.scss";
+
+.root {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	width: 100vw;
+	height: 100vh;
+	gap: fn.spacing(5);
+}
+
+.launchables {
+	display: flex;
+	gap: fn.spacing(4);
+}
+
+.others {
+	display: flex;
+}
