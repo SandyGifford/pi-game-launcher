@@ -5,11 +5,14 @@
 	--spacing: 8px;
 	--radius: 16px;
 	--color-fg: rgb(125, 125, 128);
-	--color-bg: #334;
-	--color-bg-dark: rgb(22, 22, 34);
-	--input-color-fg: white;
-	--input-color-bg: rgb(80, 80, 106);
-	--input-color-bg-dark: rgb(30, 30, 41);
-	--input-color-bg-extra-dark: rgb(13, 13, 19);
-	--border-color: rgb(118, 118, 157);
+	--control-fg: white;
 }
+
+@include theme-tools.define-color-palette("surface", #334, $step-down: 0.53);
+@include theme-tools.define-color-palette(
+	"control",
+	rgb(30, 30, 41),
+	$step: 0.26,
+	$step-down: 0.55
+);
+@include theme-tools.define-color-palette("border", rgb(118, 118, 157));

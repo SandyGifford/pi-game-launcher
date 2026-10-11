@@ -25,8 +25,8 @@
 }
 
 :root {
-	--button--background-light: alpha(from var(--input-color-bg) / 0.5);
-	--button--background-dark: alpha(from var(--input-color-bg-dark) / 0.75);
+	--button--background-light: alpha(from var(--control-light) / 0.5);
+	--button--background-dark: alpha(from var(--control) / 0.75);
 }
 
 button {
@@ -46,8 +46,8 @@ button {
 	border-style: outset;
 	font-weight: bold;
 	cursor: pointer;
-	color: var(--input-color-fg);
-	border-color: var(--border-color);
+	color: var(--control-fg);
+	border-color: var(--border);
 
 	&::after {
 		content: "";

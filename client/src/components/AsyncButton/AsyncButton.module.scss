@@ -11,11 +11,11 @@
 	@keyframes thinking-inset {
 		from {
 			--button--background-inset: 30%;
-			--button--background-dark: var(--input-color-bg-dark);
+			--button--background-dark: var(--control);
 		}
 		to {
 			--button--background-inset: 0%;
-			--button--background-dark: var(--input-color-bg-extra-dark);
+			--button--background-dark: var(--control-dark);
 		}
 	}
 
