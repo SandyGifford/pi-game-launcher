@@ -1,0 +1,31 @@
+@mixin define-color(
+	$name,
+	$color,
+	$light: hsla(from var(--#{$name}) h s calc(l + ((100 - l) * 0.5)) / alpha),
+	$dark: hsla(from var(--#{$name}) h s calc(l - (l * 0.5)) / alpha),
+	$initial: $color,
+	$light-initial: hsla(from $initial h s calc(l + ((100 - l) * 0.5)) / alpha),
+	$dark-initial: hsla(from $initial h s calc(l - (l * 0.5)) / alpha)
+) {
+	@property --#{$name} {
+		syntax: "<color>";
+		initial-value: $initial;
+		inherits: true;
+	}
+	@property --#{$name}-light {
+		syntax: "<color>";
+		initial-value: $light-initial;
+		inherits: true;
+	}
+	@property --#{$name}-dark {
+		syntax: "<color>";
+		initial-value: $dark-initial;
+		inherits: true;
+	}
+
+	:root {
+		--#{$name}: #{$color};
+		--#{$name}-light: #{$light};
+		--#{$name}-dark: #{$dark};
+	}
+}
