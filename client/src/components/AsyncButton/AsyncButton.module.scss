@@ -1,21 +1,21 @@
 .root {
 	@keyframes thinking-rotate {
 		from {
-			--button-background-rotate: -10deg;
+			--button--background-rotate: -10deg;
 		}
 		to {
-			--button-background-rotate: 350deg;
+			--button--background-rotate: 350deg;
 		}
 	}
 
 	@keyframes thinking-inset {
 		from {
-			--button-background-inset: 30%;
-			--button-background-dark: var(--input-color-bg-dark);
+			--button--background-inset: 30%;
+			--button--background-dark: var(--input-color-bg-dark);
 		}
 		to {
-			--button-background-inset: 0%;
-			--button-background-dark: var(--input-color-bg-extra-dark);
+			--button--background-inset: 0%;
+			--button--background-dark: var(--input-color-bg-extra-dark);
 		}
 	}
 

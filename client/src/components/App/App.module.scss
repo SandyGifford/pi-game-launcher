@@ -1,6 +1,77 @@
 @use "../../fn.scss";
 
+@property --App--background-light {
+	syntax: "<color>";
+	initial-value: rgb(51, 51, 68);
+	inherits: true;
+}
+
+@property --App--background-dark {
+	syntax: "<color>";
+	initial-value: rgb(22, 22, 34);
+	inherits: true;
+}
+
+@property --App--background-animate-time {
+	syntax: "<time>";
+	initial-value: 30s;
+	inherits: true;
+}
+
+:root {
+	--App--background-light: var(--color-bg);
+	--App--background-dark: var(--color-bg-dark);
+}
+
+@keyframes background-track {
+	0% {
+		background-position: 0% 0%;
+	}
+	100% {
+		background-position: 100% 100%;
+	}
+}
+@keyframes background-rotate {
+	0% {
+		transform: rotate(0);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
 .root {
+	position: relative;
+	isolation: isolate;
+	overflow: hidden;
 	color: var(--color-fg);
-	background: var(--color-bg);
+	background-color: var(--App--background-dark);
+
+	&::before {
+		content: "";
+		position: absolute;
+		z-index: -1;
+		top: 50%;
+		left: 50%;
+		width: calc(max(100vw, 100vh) * 1.5);
+		height: calc(max(100vw, 100vh) * 1.5);
+		translate: -50% -50%;
+		pointer-events: none;
+		background-image: linear-gradient(
+			var(--App--background-light) 0,
+			var(--App--background-dark) 100%
+		);
+		background-size: 200% 200%;
+		animation:
+    background-track calc(var(--App--background-animate-time) / 3) ease-in-out infinite alternate,
+    background-rotate var(--App--background-animate-time) ease-in-out infinite forwards;
+
+		@at-root {
+			@media (prefers-reduced-motion: reduce) {
+				& {
+					animation: none;
+				}
+			}
+		}
+	}
 }
