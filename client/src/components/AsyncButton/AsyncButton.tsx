@@ -2,7 +2,8 @@ import type { Fn, PromisifyProps } from "@repo/shared";
 import clsx from "clsx";
 import type { ButtonHTMLAttributes } from "react";
 import { forwardRef, memo, useEffect } from "react";
-import { useCallbackStable, useInUse } from "../../hooks";
+import { useCallbackStable } from "../../hooks/useCallbackStable.hook";
+import { useInUse } from "../../hooks/useInUse.hook";
 import classes from "./AsyncButton.module.scss";
 
 export type AsyncButtonThinkingChangeHandler = (thinking: boolean) => unknown;

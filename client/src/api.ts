@@ -1,5 +1,5 @@
 import { awaitTime, type Launchable, type LaunchableID } from "@repo/shared";
-import { carryOutLaunchAction } from "./utils";
+import { carryOutLaunchAction } from "./utils/carryOutLaunchAction.util";
 
 export const launch = async (id: LaunchableID): Promise<void> => {
 	const action = await fetch(`/api/launch/${id}`, { method: "POST" }).then((r) => r.json());

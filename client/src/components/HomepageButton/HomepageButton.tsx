@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { forwardRef, memo, type MouseEventHandler } from "react";
 import type { OverrideProperties } from "type-fest";
-import { useCallbackStable } from "../../hooks";
+import { useCallbackStable } from "../../hooks/useCallbackStable.hook";
 import { AsyncButton, type AsyncButtonProps } from "../AsyncButton/AsyncButton";
 import classes from "./HomepageButton.module.scss";
 

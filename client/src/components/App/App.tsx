@@ -2,7 +2,7 @@ import clsx from "clsx";
 import type { FC } from "react";
 import { memo, useEffect } from "react";
 import { AppContext } from "../../app.ctx";
-import { useInUse } from "../../hooks";
+import { useInUse } from "../../hooks/useInUse.hook";
 import { Homepage } from "../Homepage/Homepage";
 import classes from "./App.module.scss";
 import { awaitTime } from "@repo/shared";
