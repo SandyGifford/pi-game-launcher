@@ -19,6 +19,7 @@
 		"@types/react-transition-group": "^4.4.12",
 		"@vitejs/plugin-react": "^6.1.1",
 		"clsx": "^2.1.1",
+		"jotai": "^3.0.1",
 		"plop": "^4.0.5",
 		"react": "^19.2.8",
 		"react-dom": "^19.2.8",
