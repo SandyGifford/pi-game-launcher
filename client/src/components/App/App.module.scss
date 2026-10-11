@@ -47,6 +47,16 @@
 	color: var(--color-fg);
 	background-color: var(--App--background-dark);
 
+	transition:
+		--App--background-light 1s ease-in-out,
+		--App--background-dark 1s ease-in-out;
+
+	&--thinking {
+		--App--background-animate-time: 10s;
+		--App--background-light: color-mix(in oklab, var(--surface) 60%, #5a4bd6);
+		--App--background-dark: color-mix(in oklab, var(--surface-dark) 60%, #1b1250);
+	}
+
 	&::before {
 		content: "";
 		position: absolute;
