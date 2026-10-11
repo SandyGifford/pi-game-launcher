@@ -8,7 +8,7 @@
 
 @property --App--background-dark {
 	syntax: "<color>";
-	initial-value: rgb(22, 22, 34);
+	initial-value: rgb(24, 24, 32);
 	inherits: true;
 }
 
@@ -19,7 +19,7 @@
 }
 
 :root {
-	--App--background-light: var(--surface-surface);
+	--App--background-light: var(--surface);
 	--App--background-dark: var(--surface-dark);
 }
 
@@ -63,8 +63,8 @@
 		);
 		background-size: 200% 200%;
 		animation:
-    background-track calc(var(--App--background-animate-time) / 3) ease-in-out infinite alternate,
-    background-rotate var(--App--background-animate-time) ease-in-out infinite forwards;
+			background-track calc(var(--App--background-animate-time) / 3) ease-in-out infinite alternate,
+			background-rotate var(--App--background-animate-time) ease-in-out infinite forwards;
 
 		@at-root {
 			@media (prefers-reduced-motion: reduce) {
