@@ -1,11 +1,16 @@
-@mixin define-color(
+@use "sass:color";
+
+// $step is the fraction of the way to white (light) or black (dark) in HSL lightness
+@mixin define-color-palette(
 	$name,
 	$color,
-	$light: hsla(from var(--#{$name}) h s calc(l + ((100 - l) * 0.5)) / alpha),
-	$dark: hsla(from var(--#{$name}) h s calc(l - (l * 0.5)) / alpha),
+	$step: 0.5,
+	$step-down: $step,
+	$light: hsl(from var(--#{$name}) h s calc(l + ((100 - l) * #{$step})) / alpha),
+	$dark: hsl(from var(--#{$name}) h s calc(l - (l * #{$step-down})) / alpha),
 	$initial: $color,
-	$light-initial: hsla(from $initial h s calc(l + ((100 - l) * 0.5)) / alpha),
-	$dark-initial: hsla(from $initial h s calc(l - (l * 0.5)) / alpha)
+	$light-initial: color.scale($initial, $lightness: $step * 100%, $space: hsl),
+	$dark-initial: color.scale($initial, $lightness: -$step-down * 100%, $space: hsl)
 ) {
 	@property --#{$name} {
 		syntax: "<color>";
