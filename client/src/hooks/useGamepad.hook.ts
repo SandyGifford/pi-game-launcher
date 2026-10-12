@@ -2,11 +2,22 @@ import { atom, useAtomValue } from "jotai";
 import { atomEffect } from "jotai-effect";
 import { atomFamily } from "jotai-family";
 
+const EMPTY_BUTTON: GamepadButton = Object.freeze({ pressed: false, touched: false, value: 0 });
+
+const sameButton = (a: GamepadButton, b: GamepadButton) =>
+	a.pressed === b.pressed && a.touched === b.touched && a.value === b.value;
+
 // Native Gamepad fields are prototype getters (spread yields nothing) and the browser may
 // update the object in place, so fields are copied explicitly to get a new identity.
-const copyGamepad = (gp: Gamepad): Gamepad => ({
+// Buttons that did not change keep their previous object so subscribers get stable references.
+const copyGamepad = (gp: Gamepad, old?: Gamepad): Gamepad => ({
 	axes: [...gp.axes],
-	buttons: gp.buttons.map(({ pressed, touched, value }) => ({ pressed, touched, value })),
+	buttons: gp.buttons.map(({ pressed, touched, value }, i) => {
+		const oldButton = old?.buttons[i];
+		return oldButton && sameButton(oldButton, { pressed, touched, value })
+			? oldButton
+			: { pressed, touched, value };
+	}),
 	connected: gp.connected,
 	id: gp.id,
 	index: gp.index,
@@ -60,7 +71,7 @@ const gpPollingAtom = atomEffect((get, set) => {
 			if (old && old.timestamp === gp.timestamp) {
 				next.set(gp.index, old);
 			} else {
-				next.set(gp.index, copyGamepad(gp));
+				next.set(gp.index, copyGamepad(gp, old));
 				changed = true;
 			}
 		});
@@ -116,9 +127,51 @@ const gpPlayerAtomFamily = atomFamily((player: number) =>
 	})
 );
 
+export type GamepadControls = Pick<Gamepad, "axes" | "buttons">;
+
+// Merges every connected pad: per axis the largest magnitude wins, per button any press counts.
+const gpAnyControllerAtom = atom((get): GamepadControls => {
+	// Mounts polling; gpMapAtom alone would never be populated.
+	get(gpIndexesAtom);
+	const axes: number[] = [];
+	const buttons: GamepadButton[] = [];
+
+	get(gpMapAtom).forEach((pad) => {
+		pad.axes.forEach((value, i) => {
+			if (Math.abs(value) > Math.abs(axes[i] ?? 0)) axes[i] = value;
+			else axes[i] ??= 0;
+		});
+		pad.buttons.forEach((button, i) => {
+			const merged = buttons[i] ?? EMPTY_BUTTON;
+			buttons[i] = {
+				pressed: merged.pressed || button.pressed,
+				touched: merged.touched || button.touched,
+				value: Math.abs(button.value) > Math.abs(merged.value) ? button.value : merged.value,
+			};
+		});
+	});
+
+	return { axes, buttons };
+});
+
+// The merged button is rebuilt on every poll change, so the last value is kept per index and
+// reused while its contents are unchanged.
+const gpAnyButtonAtomFamily = atomFamily((button: number) => {
+	let last = EMPTY_BUTTON;
+	return atom((get) => {
+		const next = get(gpAnyControllerAtom).buttons[button] ?? EMPTY_BUTTON;
+		if (!sameButton(last, next)) last = next;
+		return last;
+	});
+});
+
+const gpAnyAxisAtomFamily = atomFamily((axis: number) =>
+	atom((get) => get(gpAnyControllerAtom).axes[axis] ?? 0)
+);
+
 const gpButtonAtomFamily = atomFamily(
 	({ player, button }: { readonly player: number; readonly button: number }) =>
-		atom((get) => get(gpPlayerAtomFamily(player))?.buttons[button]?.pressed ?? false),
+		atom((get) => get(gpPlayerAtomFamily(player))?.buttons[button] ?? EMPTY_BUTTON),
 	(a, b) => a.player === b.player && a.button === b.button
 );
 
@@ -133,3 +186,7 @@ export const usePlayerGamepadButton = (player: number, button: number) =>
 	useAtomValue(gpButtonAtomFamily({ player, button }));
 export const usePlayerGamepadAxis = (player: number, axis: number) =>
 	useAtomValue(gpAxisAtomFamily({ player, axis }));
+export const useAnyController = () => useAtomValue(gpAnyControllerAtom);
+export const useAnyControllerAxis = (axis: number) => useAtomValue(gpAnyAxisAtomFamily(axis));
+export const useAnyControllerButton = (button: number) =>
+	useAtomValue(gpAnyButtonAtomFamily(button));
