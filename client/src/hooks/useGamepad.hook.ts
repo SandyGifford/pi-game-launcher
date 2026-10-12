@@ -20,6 +20,30 @@ const copyGamepad = (gp: Gamepad): Gamepad => ({
 const gpMapAtom = atom<ReadonlyMap<number, Gamepad>>(new Map());
 const gpIndexListAtom = atom<readonly number[]>([]);
 
+// player number (1-based) -> gamepad index. Deliberately never cleared (not even when polling
+// stops): a pad that reconnects on the same index regains its player slot. It stays tiny
+// (two numbers per pad ever seen).
+const gpPlayerClaimsAtom = atom<ReadonlyMap<number, number>>(new Map());
+
+// Gives each not-yet-claimed index the lowest free player number; existing claims never move.
+const claimPlayers = (
+	claims: ReadonlyMap<number, number>,
+	indexes: readonly number[]
+): ReadonlyMap<number, number> => {
+	const claimed = new Set(claims.values());
+	const unclaimed = indexes.filter((index) => !claimed.has(index));
+	if (!unclaimed.length) return claims;
+
+	const next = new Map(claims);
+	unclaimed.forEach((index) => {
+		const player = Array.from({ length: next.size + 1 }, (_, i) => i + 1).find(
+			(p) => !next.has(p)
+		)!;
+		next.set(player, index);
+	});
+	return next;
+};
+
 const gpPollingAtom = atomEffect((get, set) => {
 	let frameId: number;
 
@@ -49,6 +73,7 @@ const gpPollingAtom = atomEffect((get, set) => {
 
 		if (changed || indexesChanged) set(gpMapAtom, next);
 		if (indexesChanged) {
+			set(gpPlayerClaimsAtom, claimPlayers(get.peek(gpPlayerClaimsAtom), nextIndexes));
 			set(gpIndexListAtom, nextIndexes);
 			[...gpAtomFamily.getParams()].forEach((index) => {
 				if (!next.has(index)) gpAtomFamily.remove(index);
@@ -84,7 +109,9 @@ const EMPTY_ATOM = atom(() => undefined);
 
 const gpPlayerAtomFamily = atomFamily((player: number) =>
 	atom((get) => {
-		const index = get(gpIndexesAtom)[player - 1];
+		// Subscribing to the index list also re-resolves the pad atom after its cache entry is pruned.
+		get(gpIndexesAtom);
+		const index = get(gpPlayerClaimsAtom).get(player);
 		return index === undefined ? get(EMPTY_ATOM) : get(gpAtomFamily(index));
 	})
 );
