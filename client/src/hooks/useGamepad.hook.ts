@@ -1,6 +1,50 @@
 import { atom, useAtomValue } from "jotai";
 import { atomEffect } from "jotai-effect";
 import { atomFamily } from "jotai-family";
+import { useMemo } from "react";
+
+const AXIS_LABELS = [
+	/* 0 */ "LEFT_STICK_X",
+	/* 1 */ "LEFT_STICK_Y",
+	/* 2 */ "RIGHT_STICK_X",
+	/* 3 */ "RIGHT_STICK_Y",
+] as const satisfies string[];
+
+const BUTTON_LABELS = [
+	/*  0 */ "FACE_BOTTOM",
+	/*  1 */ "FACE_RIGHT",
+	/*  2 */ "FACE_LEFT",
+	/*  3 */ "FACE_TOP",
+	/*  4 */ "LEFT_BUMPER",
+	/*  5 */ "RIGHT_BUMPER",
+	/*  6 */ "LEFT_TRIGGER",
+	/*  7 */ "RIGHT_TRIGGER",
+	/*  8 */ "SYSTEM_LEFT",
+	/*  9 */ "SYSTEM_RIGHT",
+	/* 10 */ "LEFT_STICK",
+	/* 11 */ "RIGHT_STICK",
+	/* 12 */ "DPAD_UP",
+	/* 13 */ "DPAD_DOWN",
+	/* 14 */ "DPAD_LEFT",
+	/* 15 */ "DPAD_RIGHT",
+	/* 16 */ "SYSTEM_CENTER",
+] as const satisfies string[];
+
+export type GamepadAxisLabel = (typeof AXIS_LABELS)[number];
+export type GamepadButtonLabel = (typeof BUTTON_LABELS)[number];
+
+const AXIS_LABEL_INDEX_MAP = Object.fromEntries(AXIS_LABELS.map((label, i) => [label, i])) as {
+	readonly [LABEL in GamepadAxisLabel]: number;
+};
+
+const BUTTON_LABEL_INDEX_MAP = Object.fromEntries(BUTTON_LABELS.map((label, i) => [label, i])) as {
+	readonly [LABEL in GamepadButtonLabel]: number;
+};
+
+const resolveButtonIndex = (button: number | GamepadButtonLabel): number =>
+	typeof button === "number" ? button : BUTTON_LABEL_INDEX_MAP[button];
+const resolveAxisIndex = (axis: number | GamepadAxisLabel): number =>
+	typeof axis === "number" ? axis : AXIS_LABEL_INDEX_MAP[axis];
 
 const EMPTY_BUTTON: GamepadButton = Object.freeze({ pressed: false, touched: false, value: 0 });
 
@@ -129,6 +173,9 @@ const gpPlayerAtomFamily = atomFamily((player: number) =>
 
 export type GamepadControls = Pick<Gamepad, "axes" | "buttons">;
 
+const pickLeastZero = (...values: readonly number[]): number =>
+	values.reduce((ret, val) => (Math.abs(val) > Math.abs(ret) ? val : ret), 0);
+
 // Merges every connected pad: per axis the largest magnitude wins, per button any press counts.
 const gpAnyControllerAtom = atom((get): GamepadControls => {
 	// Mounts polling; gpMapAtom alone would never be populated.
@@ -138,15 +185,14 @@ const gpAnyControllerAtom = atom((get): GamepadControls => {
 
 	get(gpMapAtom).forEach((pad) => {
 		pad.axes.forEach((value, i) => {
-			if (Math.abs(value) > Math.abs(axes[i] ?? 0)) axes[i] = value;
-			else axes[i] ??= 0;
+			axes[i] = pickLeastZero(axes[i] ?? 0, value);
 		});
 		pad.buttons.forEach((button, i) => {
 			const merged = buttons[i] ?? EMPTY_BUTTON;
 			buttons[i] = {
 				pressed: merged.pressed || button.pressed,
 				touched: merged.touched || button.touched,
-				value: Math.abs(button.value) > Math.abs(merged.value) ? button.value : merged.value,
+				value: pickLeastZero(merged.value, button.value),
 			};
 		});
 	});
@@ -165,8 +211,16 @@ const gpAnyButtonAtomFamily = atomFamily((button: number) => {
 	});
 });
 
-const gpAnyAxisAtomFamily = atomFamily((axis: number) =>
-	atom((get) => get(gpAnyControllerAtom).axes[axis] ?? 0)
+const DEFAULT_DEAD_ZONE = 0.1;
+
+const applyDeadZone = (value: number, deadZone: number): number =>
+	Math.abs(value) < deadZone ? 0 : value;
+
+// The dead zone is applied inside the atoms so values jittering within it never notify subscribers.
+const gpAnyAxisAtomFamily = atomFamily(
+	({ axis, deadZone }: { readonly axis: number; readonly deadZone: number }) =>
+		atom((get) => applyDeadZone(get(gpAnyControllerAtom).axes[axis] ?? 0, deadZone)),
+	(a, b) => a.axis === b.axis && a.deadZone === b.deadZone
 );
 
 const gpButtonAtomFamily = atomFamily(
@@ -176,17 +230,84 @@ const gpButtonAtomFamily = atomFamily(
 );
 
 const gpAxisAtomFamily = atomFamily(
-	({ player, axis }: { readonly player: number; readonly axis: number }) =>
-		atom((get) => get(gpPlayerAtomFamily(player))?.axes[axis] ?? 0),
-	(a, b) => a.player === b.player && a.axis === b.axis
+	({
+		player,
+		axis,
+		deadZone,
+	}: {
+		readonly player: number;
+		readonly axis: number;
+		readonly deadZone: number;
+	}) =>
+		atom((get) =>
+			applyDeadZone(get(gpPlayerAtomFamily(player))?.axes[axis] ?? 0, deadZone)
+		),
+	(a, b) => a.player === b.player && a.axis === b.axis && a.deadZone === b.deadZone
 );
 
 export const usePlayerGamepad = (player: number) => useAtomValue(gpPlayerAtomFamily(player));
-export const usePlayerGamepadButton = (player: number, button: number) =>
-	useAtomValue(gpButtonAtomFamily({ player, button }));
-export const usePlayerGamepadAxis = (player: number, axis: number) =>
-	useAtomValue(gpAxisAtomFamily({ player, axis }));
+export const usePlayerGamepadButton = (player: number, button: number | GamepadButtonLabel) =>
+	useAtomValue(
+		gpButtonAtomFamily({
+			player,
+			button: resolveButtonIndex(button),
+		})
+	);
+
+export type GamepadStick = { readonly x: number; readonly y: number };
+
+export type AxisOptions = { readonly deadZone?: number };
+export type StickOptions = {
+	readonly deadZone?: number | { readonly x: number; readonly y: number };
+};
+
+const resolveStickDeadZone = ({ deadZone = DEFAULT_DEAD_ZONE }: StickOptions): GamepadStick =>
+	typeof deadZone === "number" ? { x: deadZone, y: deadZone } : deadZone;
+
+export const usePlayerGamepadAxis = (
+	player: number,
+	axis: number | GamepadAxisLabel,
+	{ deadZone = DEFAULT_DEAD_ZONE }: AxisOptions = {}
+) => useAtomValue(gpAxisAtomFamily({ player, axis: resolveAxisIndex(axis), deadZone }));
 export const useAnyController = () => useAtomValue(gpAnyControllerAtom);
-export const useAnyControllerAxis = (axis: number) => useAtomValue(gpAnyAxisAtomFamily(axis));
-export const useAnyControllerButton = (button: number) =>
-	useAtomValue(gpAnyButtonAtomFamily(button));
+export const useAnyControllerAxis = (
+	axis: number | GamepadAxisLabel,
+	{ deadZone = DEFAULT_DEAD_ZONE }: AxisOptions = {}
+) => useAtomValue(gpAnyAxisAtomFamily({ axis: resolveAxisIndex(axis), deadZone }));
+export const useAnyControllerButton = (button: number | GamepadButtonLabel) =>
+	useAtomValue(gpAnyButtonAtomFamily(resolveButtonIndex(button)));
+export const useAnyLeftStick = (options: StickOptions = {}): GamepadStick => {
+	const deadZone = resolveStickDeadZone(options);
+	return {
+		x: useAnyControllerAxis("LEFT_STICK_X", { deadZone: deadZone.x }),
+		y: useAnyControllerAxis("LEFT_STICK_Y", { deadZone: deadZone.y }),
+	};
+};
+export const useAnyRightStick = (options: StickOptions = {}): GamepadStick => {
+	const deadZone = resolveStickDeadZone(options);
+	return {
+		x: useAnyControllerAxis("RIGHT_STICK_X", { deadZone: deadZone.x }),
+		y: useAnyControllerAxis("RIGHT_STICK_Y", { deadZone: deadZone.y }),
+	};
+};
+
+// Digital, so no dead zone. Same orientation as the sticks: negative is left/up.
+export const useAnyDPadStick = (): GamepadStick => {
+	const up = useAnyControllerButton("DPAD_UP").value;
+	const down = useAnyControllerButton("DPAD_DOWN").value;
+	const left = useAnyControllerButton("DPAD_LEFT").value;
+	const right = useAnyControllerButton("DPAD_RIGHT").value;
+
+	return { x: right - left, y: down - up };
+};
+
+export const useAnyDirection = (options: StickOptions = {}): GamepadStick => {
+	const ls = useAnyLeftStick(options);
+	const rs = useAnyRightStick(options);
+	const dp = useAnyDPadStick();
+
+	return {
+		x: useMemo(() => pickLeastZero(ls.x, rs.x, dp.x), [dp.x, ls.x, rs.x]),
+		y: useMemo(() => pickLeastZero(ls.y, rs.y, dp.y), [dp.y, ls.y, rs.y]),
+	};
+};
