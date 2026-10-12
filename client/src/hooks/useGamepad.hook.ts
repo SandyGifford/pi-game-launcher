@@ -256,34 +256,34 @@ export const usePlayerGamepadButton = (player: number, button: number | GamepadB
 
 export type GamepadStick = { readonly x: number; readonly y: number };
 
-export type AxisOptions = { readonly deadZone?: number };
-export type StickOptions = {
+export type GamepadAxisOptions = { readonly deadZone?: number };
+export type GamepadStickOptions = {
 	readonly deadZone?: number | { readonly x: number; readonly y: number };
 };
 
-const resolveStickDeadZone = ({ deadZone = DEFAULT_DEAD_ZONE }: StickOptions): GamepadStick =>
+const resolveStickDeadZone = ({ deadZone = DEFAULT_DEAD_ZONE }: GamepadStickOptions): GamepadStick =>
 	typeof deadZone === "number" ? { x: deadZone, y: deadZone } : deadZone;
 
 export const usePlayerGamepadAxis = (
 	player: number,
 	axis: number | GamepadAxisLabel,
-	{ deadZone = DEFAULT_DEAD_ZONE }: AxisOptions = {}
+	{ deadZone = DEFAULT_DEAD_ZONE }: GamepadAxisOptions = {}
 ) => useAtomValue(gpAxisAtomFamily({ player, axis: resolveAxisIndex(axis), deadZone }));
 export const useAnyController = () => useAtomValue(gpAnyControllerAtom);
 export const useAnyControllerAxis = (
 	axis: number | GamepadAxisLabel,
-	{ deadZone = DEFAULT_DEAD_ZONE }: AxisOptions = {}
+	{ deadZone = DEFAULT_DEAD_ZONE }: GamepadAxisOptions = {}
 ) => useAtomValue(gpAnyAxisAtomFamily({ axis: resolveAxisIndex(axis), deadZone }));
 export const useAnyControllerButton = (button: number | GamepadButtonLabel) =>
 	useAtomValue(gpAnyButtonAtomFamily(resolveButtonIndex(button)));
-export const useAnyLeftStick = (options: StickOptions = {}): GamepadStick => {
+export const useAnyLeftStick = (options: GamepadStickOptions = {}): GamepadStick => {
 	const deadZone = resolveStickDeadZone(options);
 	return {
 		x: useAnyControllerAxis("LEFT_STICK_X", { deadZone: deadZone.x }),
 		y: useAnyControllerAxis("LEFT_STICK_Y", { deadZone: deadZone.y }),
 	};
 };
-export const useAnyRightStick = (options: StickOptions = {}): GamepadStick => {
+export const useAnyRightStick = (options: GamepadStickOptions = {}): GamepadStick => {
 	const deadZone = resolveStickDeadZone(options);
 	return {
 		x: useAnyControllerAxis("RIGHT_STICK_X", { deadZone: deadZone.x }),
@@ -301,7 +301,7 @@ export const useAnyDPadStick = (): GamepadStick => {
 	return { x: right - left, y: down - up };
 };
 
-export const useAnyDirection = (options: StickOptions = {}): GamepadStick => {
+export const useAnyDirection = (options: GamepadStickOptions = {}): GamepadStick => {
 	const ls = useAnyLeftStick(options);
 	const rs = useAnyRightStick(options);
 	const dp = useAnyDPadStick();
