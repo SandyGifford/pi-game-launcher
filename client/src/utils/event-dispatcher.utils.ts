@@ -123,3 +123,47 @@ export function createEventDispatcher<VALUE>(
 		getReadonly,
 	};
 }
+
+export type EventDispatcherValue<DISPATCHER> =
+	DISPATCHER extends EventDispatcher<infer VALUE> ? VALUE : never;
+
+export type EventDispatcherFamily<PARAM, DISPATCHER extends EventDispatcher<never>> = {
+	(
+		value: PARAM,
+		firstListener: EventDispatcherValueListener<EventDispatcherValue<DISPATCHER>>
+	): DISPATCHER;
+};
+
+export function eventDispatcherFamily<PARAM, DISPATCHER extends EventDispatcher<never>>(
+	fn: (param: PARAM) => DISPATCHER
+): EventDispatcherFamily<PARAM, DISPATCHER>;
+export function eventDispatcherFamily<PARAM, DISPATCHER extends EventDispatcher<never>, KEY>(
+	fn: (param: PARAM) => DISPATCHER,
+	getKey: (param: PARAM) => KEY
+): EventDispatcherFamily<PARAM, DISPATCHER>;
+export function eventDispatcherFamily<
+	PARAM,
+	DISPATCHER extends EventDispatcher<never>,
+	KEY = PARAM,
+>(
+	fn: (param: PARAM) => DISPATCHER,
+	getKey: (param: PARAM) => KEY = (param) => param as unknown as KEY
+): EventDispatcherFamily<PARAM, DISPATCHER> {
+	const map = new Map<unknown, DISPATCHER>();
+	return (param, firstListener) => {
+		const key = getKey(param);
+		const existing = map.get(key);
+		if (existing) {
+			existing.on("value", firstListener);
+			return existing;
+		}
+
+		const dispatcher = fn(param);
+		map.set(key, dispatcher);
+		dispatcher.on("unmount", () => {
+			if (map.get(key) === dispatcher) map.delete(key);
+		});
+		dispatcher.on("value", firstListener);
+		return dispatcher;
+	};
+}
