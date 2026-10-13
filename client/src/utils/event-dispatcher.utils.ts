@@ -1,6 +1,39 @@
+export class EventDispatcherError extends Error {}
+
+/** Thrown when several callbacks are run in isolation; `cause` is the first failure. */
+export class EventDispatcherMultiError extends EventDispatcherError {
+	readonly errors: readonly unknown[];
+
+	constructor(message: string, errors: readonly unknown[]) {
+		super(message, { cause: errors[0] });
+		this.errors = errors;
+	}
+}
+
+/** A value listener threw during `fire` (or while reporting the current state on `on`). */
+export class EventDispatcherListenerError extends EventDispatcherMultiError {}
+
+/** A mount listener threw. The listener that was being added has been rolled back. */
+export class EventDispatcherMountError extends EventDispatcherMultiError {}
+
+/** An unmount listener or a mount cleanup threw. All of them still ran. */
+export class EventDispatcherUnmountError extends EventDispatcherMultiError {}
+
+const runIsolated = (fns: readonly (() => unknown)[]): unknown[] => {
+	const errors: unknown[] = [];
+	fns.forEach((fn) => {
+		try {
+			fn();
+		} catch (e) {
+			errors.push(e);
+		}
+	});
+	return errors;
+};
+
 export type EventDispatcherType = "value" | "mount" | "unmount";
 export type EventDispatcherValueListener<VALUE> = (value: VALUE) => unknown;
-export type EventDispatcherMountListener = () => unknown;
+export type EventDispatcherMountListener = () => void | (() => unknown);
 export type EventDispatcherUnMountListener = () => unknown;
 export type EventDispatcherUnsub = () => void;
 
@@ -51,13 +84,13 @@ export type StatefulEventDispatcherOptions<VALUE> = EventDispatcherOptions & {
 	readonly reportStateImmediately?: boolean;
 };
 
-export function createEventDispatcher<VALUE>(
+export function eventDispatcher<VALUE>(
 	options?: EventDispatcherOptions & { readonly initialState?: never }
 ): EventDispatcher<VALUE>;
-export function createEventDispatcher<VALUE>(
+export function eventDispatcher<VALUE>(
 	options: StatefulEventDispatcherOptions<VALUE>
 ): StatefulEventDispatcher<VALUE>;
-export function createEventDispatcher<VALUE>(
+export function eventDispatcher<VALUE>(
 	options: StatefulEventDispatcherOptions<VALUE> | EventDispatcherOptions = {}
 ): StatefulEventDispatcher<VALUE> | EventDispatcher<VALUE> {
 	const stateful = "initialState" in options;
@@ -71,32 +104,84 @@ export function createEventDispatcher<VALUE>(
 		mount: new Set(),
 		unmount: new Set(),
 	};
+	const cleanupFns = new Map<EventDispatcherMountListener, () => unknown>();
 
-	const off: EventDispatcherOff<VALUE> = (type, listener) => {
-		const sizeBefore = listeners.value.size;
+	const teardown = (): unknown[] => {
+		const cleanups = [...cleanupFns.values()];
+		cleanupFns.clear();
+		return runIsolated([...listeners.unmount, ...cleanups]);
+	};
+
+	// Never throws; returns the errors so `off` can report them and `on` can fold them into a rollback.
+	const removeListener = <TYPE extends EventDispatcherType>(
+		type: TYPE,
+		listener: TypeListeners<VALUE>[TYPE]
+	): unknown[] => {
+		const valueSizeBefore = listeners.value.size;
 		listeners[type].delete(listener);
-		const sizeAfter = listeners.value.size;
+		const valueSizeAfter = listeners.value.size;
 
 		switch (type) {
 			case "value":
-				if (sizeBefore !== sizeAfter && sizeAfter === 0) listeners.unmount.forEach((l) => l());
-				break;
+				return valueSizeBefore !== valueSizeAfter && valueSizeAfter === 0 ? teardown() : [];
+			case "mount": {
+				const mountListener = listener as EventDispatcherMountListener;
+				const cleanup = cleanupFns.get(mountListener);
+				cleanupFns.delete(mountListener);
+				return cleanup ? runIsolated([cleanup]) : [];
+			}
+			default:
+				return [];
 		}
 	};
 
+	const off: EventDispatcherOff<VALUE> = (type, listener) => {
+		const errors = removeListener(type, listener);
+		if (errors.length)
+			throw new EventDispatcherUnmountError("Unmount listeners or cleanups threw", errors);
+	};
+
 	const on: EventDispatcherOn<VALUE> = (type, listener) => {
-		const sizeBefore = listeners.value.size;
+		const valueSizeBefore = listeners.value.size;
+		const alreadyAdded = listeners[type].has(listener);
 		listeners[type].add(listener);
-		const sizeAfter = listeners.value.size;
+		const valueSizeAfter = listeners.value.size;
+
+		// The caller never receives an unsubscribe function if we throw, so undo what we added.
+		const rollback = (): unknown[] => (alreadyAdded ? [] : removeListener(type, listener));
 
 		switch (type) {
 			case "value":
-				if (sizeBefore !== sizeAfter && sizeAfter === 1) listeners.mount.forEach((l) => l());
-				if (reportStateImmediately) (listener as EventDispatcherValueListener<VALUE>)(state!);
+				if (valueSizeBefore !== valueSizeAfter && valueSizeAfter === 1) {
+					for (const mountListener of [...listeners.mount]) {
+						try {
+							const cleanup = mountListener();
+							if (cleanup) cleanupFns.set(mountListener, cleanup);
+						} catch (e) {
+							throw new EventDispatcherMountError("A mount listener threw", [e, ...rollback()]);
+						}
+					}
+				}
+				if (reportStateImmediately) {
+					try {
+						(listener as EventDispatcherValueListener<VALUE>)(state!);
+					} catch (e) {
+						throw new EventDispatcherListenerError("A value listener threw", [e, ...rollback()]);
+					}
+				}
 				break;
-			case "mount":
-				if (sizeAfter !== 0) (listener as EventDispatcherMountListener)();
+			case "mount": {
+				const mountListener = listener as EventDispatcherMountListener;
+				if (!alreadyAdded && valueSizeAfter !== 0) {
+					try {
+						const cleanup = mountListener();
+						if (cleanup) cleanupFns.set(mountListener, cleanup);
+					} catch (e) {
+						throw new EventDispatcherMountError("A mount listener threw", [e, ...rollback()]);
+					}
+				}
 				break;
+			}
 		}
 
 		return () => off(type, listener);
@@ -104,8 +189,11 @@ export function createEventDispatcher<VALUE>(
 
 	const fire: EventDispatcherFire<VALUE> = (value) => {
 		if (stateful) state = value;
-		listeners.value.forEach((l) => l(value));
+		// A throwing listener must not starve the others; all errors are reported together afterwards.
+		const errors = runIsolated([...listeners.value].map((l) => () => l(value)));
+		if (errors.length) throw new EventDispatcherListenerError("Value listeners threw", errors);
 	};
+
 
 	const ro: ReadonlyEventDispatcher<VALUE> | ReadonlyStatefulEventDispatcher<VALUE> = {
 		on,
@@ -122,6 +210,11 @@ export function createEventDispatcher<VALUE>(
 	};
 }
 
+export type EventDispatcherFamilyOptions = object;
+export type EventDispatcherFamilyWithKeyOptions<PARAM, KEY> = EventDispatcherFamilyOptions & {
+	readonly getKey: (param: PARAM) => KEY;
+};
+
 export type EventDispatcherFamily<PARAM, DISPATCHER extends EventDispatcher<never>, KEY> = {
 	(param: PARAM): DISPATCHER;
 	readonly remove: (key: KEY) => void;
@@ -129,11 +222,12 @@ export type EventDispatcherFamily<PARAM, DISPATCHER extends EventDispatcher<neve
 };
 
 export function eventDispatcherFamily<PARAM, DISPATCHER extends EventDispatcher<never>>(
-	fn: (param: PARAM) => DISPATCHER
+	fn: (param: PARAM) => DISPATCHER,
+	options?: EventDispatcherFamilyOptions & { readonly getKey?: never }
 ): EventDispatcherFamily<PARAM, DISPATCHER, PARAM>;
 export function eventDispatcherFamily<PARAM, DISPATCHER extends EventDispatcher<never>, KEY>(
 	fn: (param: PARAM) => DISPATCHER,
-	getKey: (param: PARAM) => KEY
+	options: EventDispatcherFamilyWithKeyOptions<PARAM, KEY>
 ): EventDispatcherFamily<PARAM, DISPATCHER, KEY>;
 export function eventDispatcherFamily<
 	PARAM,
@@ -141,8 +235,12 @@ export function eventDispatcherFamily<
 	KEY = PARAM,
 >(
 	fn: (param: PARAM) => DISPATCHER,
-	getKey: (param: PARAM) => KEY = (param) => param as unknown as KEY
+	options:
+		| (EventDispatcherFamilyOptions & { readonly getKey?: never })
+		| EventDispatcherFamilyWithKeyOptions<PARAM, KEY> = {}
 ): EventDispatcherFamily<PARAM, DISPATCHER, KEY> {
+	const { getKey = (param) => param as unknown as KEY } = options;
+
 	const map = new Map<KEY, DISPATCHER>();
 	return Object.assign(
 		(param: PARAM) => {
