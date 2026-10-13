@@ -22,13 +22,37 @@ export type EventDispatcherOff<VALUE> = <TYPE extends EventDispatcherType>(
 
 export type EventDispatcherFire<VALUE> = (value: VALUE) => void;
 
+export type EventDispatcherGet<VALUE> = () => VALUE;
+
 export type EventDispatcher<VALUE> = {
 	readonly on: EventDispatcherOn<VALUE>;
 	readonly off: EventDispatcherOff<VALUE>;
 	readonly fire: EventDispatcherFire<VALUE>;
 };
+export type StatefulEventDispatcher<VALUE> = EventDispatcher<VALUE> & {
+	readonly get: EventDispatcherGet<VALUE>;
+};
 
-export const createEventDispatcher = <VALUE>(): EventDispatcher<VALUE> => {
+export type EventDispatcherOptions = object;
+
+export type StatefulEventDispatcherOptions<VALUE> = EventDispatcherOptions & {
+	readonly initialState: VALUE;
+	readonly reportStateImmediately?: boolean;
+};
+
+export function createEventDispatcher<VALUE>(
+	options?: EventDispatcherOptions & { readonly initialState?: never }
+): EventDispatcher<VALUE>;
+export function createEventDispatcher<VALUE>(
+	options: StatefulEventDispatcherOptions<VALUE>
+): StatefulEventDispatcher<VALUE>;
+export function createEventDispatcher<VALUE>(
+	options: StatefulEventDispatcherOptions<VALUE> | EventDispatcherOptions = {}
+): StatefulEventDispatcher<VALUE> | EventDispatcher<VALUE> {
+	const stateful = "initialState" in options;
+	let state = stateful ? options.initialState : undefined;
+	const reportStateImmediately = stateful ? !!options.reportStateImmediately : false;
+
 	const listeners: {
 		readonly [TYPE in EventDispatcherType]: Set<TypeListeners<VALUE>[TYPE]>;
 	} = {
@@ -56,8 +80,8 @@ export const createEventDispatcher = <VALUE>(): EventDispatcher<VALUE> => {
 
 		switch (type) {
 			case "value":
-				if (sizeBefore !== sizeAfter && sizeAfter === 1)
-					listeners.mount.forEach((l) => l());
+				if (sizeBefore !== sizeAfter && sizeAfter === 1) listeners.mount.forEach((l) => l());
+				if (reportStateImmediately) (listener as EventDispatcherValueListener<VALUE>)(state!);
 				break;
 			case "mount":
 				if (sizeAfter !== 0) (listener as EventDispatcherMountListener)();
@@ -66,11 +90,16 @@ export const createEventDispatcher = <VALUE>(): EventDispatcher<VALUE> => {
 
 		return () => off(type, listener);
 	};
-	const fire: EventDispatcherFire<VALUE> = (value) => listeners.value.forEach((l) => l(value));
+
+	const fire: EventDispatcherFire<VALUE> = (value) => {
+		if (stateful) state = value;
+		listeners.value.forEach((l) => l(value));
+	};
 
 	return {
 		on,
 		off,
 		fire,
+		...(stateful ? { get: () => state } : {}),
 	};
-};
+}
