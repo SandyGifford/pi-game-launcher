@@ -7,7 +7,7 @@ import {
 	eventDispatcherFamily,
 	type EventDispatcher,
 	type StatefulEventDispatcher,
-} from "./event-dispatcher.utils";
+} from "./event-dispatcher";
 
 const catchError = (fn: () => unknown): unknown => {
 	try {

@@ -1,4 +1,4 @@
-import { eventDispatcher } from "./event-dispatcher.utils";
+import { eventDispatcher } from "../event-dispatcher/event-dispatcher";
 
 export type GamepadState = Omit<Gamepad, "vibrationActuator">;
 
