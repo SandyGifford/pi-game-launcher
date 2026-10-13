@@ -1,4 +1,11 @@
 @use "../../fn.scss";
 
 .root {
+	transition: fn.transition(transform, border-width);
+	&:focus {
+		outline: none;
+		transform: scale(1.15);
+    border-width: 3px;
+    z-index: 1;
+	}
 }
