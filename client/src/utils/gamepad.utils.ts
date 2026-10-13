@@ -48,6 +48,11 @@ const BUTTON_LABEL_INDEX_MAP = Object.fromEntries(BUTTON_LABELS.map((label, i) =
 	readonly [LABEL in GamepadButtonLabel]: number;
 };
 
+const DEFAULT_DEAD_ZONE = 0.05;
+
+const applyAxisDeadZone = (value: number, deadZone: number | undefined): number =>
+	Math.abs(value) < (deadZone || DEFAULT_DEAD_ZONE) ? 0 : value;
+
 const resolveButtonIndex = (button: number | GamepadButtonLabel): number =>
 	typeof button === "number" ? button : BUTTON_LABEL_INDEX_MAP[button];
 const resolveAxisIndex = (axis: number | GamepadAxisLabel): number =>
@@ -101,8 +106,11 @@ const copyButton = (btn: GamepadButton): GamepadButton => ({
 	value: btn.value,
 });
 
-const getGamepadState = (gp: Gamepad | GamepadState, old?: GamepadState): GamepadState => {
-	const axes = mergeArrays([...gp.axes], old?.axes);
+const getGamepadState = (
+	gp: Gamepad | GamepadState,
+	old: GamepadState | undefined
+): GamepadState => {
+	const axes = mergeArrays(gp.axes.map(applyAxisDeadZone), old?.axes);
 	const buttons = mergeArrays(gp.buttons.map(copyButton), old?.buttons, sameButton);
 
 	if (
@@ -259,10 +267,10 @@ const allGPDirectionsDist = reducerEventDispatcher<GamepadStick>()(
 			y: axes[resolveAxisIndex("RIGHT_STICK_Y")] ?? 0,
 		};
 
-		const up = buttons[resolveButtonIndex("DPAD_UP")]?.value || 0;
-		const down = buttons[resolveButtonIndex("DPAD_DOWN")]?.value || 0;
-		const left = buttons[resolveButtonIndex("DPAD_LEFT")]?.value || 0;
-		const right = buttons[resolveButtonIndex("DPAD_RIGHT")]?.value || 0;
+		const up = buttons[resolveButtonIndex("DPAD_UP")]?.value ?? 0;
+		const down = buttons[resolveButtonIndex("DPAD_DOWN")]?.value ?? 0;
+		const left = buttons[resolveButtonIndex("DPAD_LEFT")]?.value ?? 0;
+		const right = buttons[resolveButtonIndex("DPAD_RIGHT")]?.value ?? 0;
 
 		const dp: GamepadStick = { x: right - left, y: down - up };
 
