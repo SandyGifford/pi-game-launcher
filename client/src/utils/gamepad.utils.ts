@@ -1,11 +1,57 @@
 import { eventDispatcher } from "../event-dispatcher/event-dispatcher";
 import { eventDispatcherFamily } from "../event-dispatcher/event-dispatcher-family";
-import { bindDispatcher } from "../event-dispatcher/event-dispatcher.utils";
+import { reducerEventDispatcher } from "../event-dispatcher/event-dispatcher-reducer";
 
 export type GamepadState = Omit<Gamepad, "vibrationActuator">;
+export type GamepadControls = Pick<Gamepad, "axes" | "buttons">;
+export type GamepadStick = { readonly x: number; readonly y: number };
+
 type GamepadByIndexMap = ReadonlyMap<number, GamepadState>;
 type GamepadIndexByPlayerMap = ReadonlyMap<number, number>;
 type GamepadByPlayerMap = ReadonlyMap<number, GamepadState>;
+
+const AXIS_LABELS = [
+	/* 0 */ "LEFT_STICK_X",
+	/* 1 */ "LEFT_STICK_Y",
+	/* 2 */ "RIGHT_STICK_X",
+	/* 3 */ "RIGHT_STICK_Y",
+] as const satisfies string[];
+
+const BUTTON_LABELS = [
+	/*  0 */ "FACE_BOTTOM",
+	/*  1 */ "FACE_RIGHT",
+	/*  2 */ "FACE_LEFT",
+	/*  3 */ "FACE_TOP",
+	/*  4 */ "LEFT_BUMPER",
+	/*  5 */ "RIGHT_BUMPER",
+	/*  6 */ "LEFT_TRIGGER",
+	/*  7 */ "RIGHT_TRIGGER",
+	/*  8 */ "SYSTEM_LEFT",
+	/*  9 */ "SYSTEM_RIGHT",
+	/* 10 */ "LEFT_STICK",
+	/* 11 */ "RIGHT_STICK",
+	/* 12 */ "DPAD_UP",
+	/* 13 */ "DPAD_DOWN",
+	/* 14 */ "DPAD_LEFT",
+	/* 15 */ "DPAD_RIGHT",
+	/* 16 */ "SYSTEM_CENTER",
+] as const satisfies string[];
+
+export type GamepadAxisLabel = (typeof AXIS_LABELS)[number];
+export type GamepadButtonLabel = (typeof BUTTON_LABELS)[number];
+
+const AXIS_LABEL_INDEX_MAP = Object.fromEntries(AXIS_LABELS.map((label, i) => [label, i])) as {
+	readonly [LABEL in GamepadAxisLabel]: number;
+};
+
+const BUTTON_LABEL_INDEX_MAP = Object.fromEntries(BUTTON_LABELS.map((label, i) => [label, i])) as {
+	readonly [LABEL in GamepadButtonLabel]: number;
+};
+
+const resolveButtonIndex = (button: number | GamepadButtonLabel): number =>
+	typeof button === "number" ? button : BUTTON_LABEL_INDEX_MAP[button];
+const resolveAxisIndex = (axis: number | GamepadAxisLabel): number =>
+	typeof axis === "number" ? axis : AXIS_LABEL_INDEX_MAP[axis];
 
 // Gives each not-yet-claimed index the lowest free player number; existing claims never move.
 const claimPlayers = (
@@ -82,9 +128,7 @@ const getGamepadState = (gp: Gamepad | GamepadState, old?: GamepadState): Gamepa
 	};
 };
 
-const gpByIndexDisp = eventDispatcher<GamepadByIndexMap>({
-	initialState: new Map(),
-});
+const gpByIndexDisp = eventDispatcher<GamepadByIndexMap>(new Map());
 gpByIndexDisp.on("mount", () => {
 	let frameId = 0;
 
@@ -130,15 +174,14 @@ gpByIndexDisp.on("mount", () => {
 	};
 });
 
-const indexByPlayerDisp = eventDispatcher<GamepadIndexByPlayerMap>({ initialState: new Map() });
-const gpByPlayerDisp = eventDispatcher<GamepadByPlayerMap>({ initialState: new Map() });
-
-bindDispatcher(indexByPlayerDisp, [gpByIndexDisp], ([gpByIndex], current) =>
-	claimPlayers(current, [...gpByIndex.keys()])
+const indexByPlayerDisp = reducerEventDispatcher<GamepadIndexByPlayerMap>()(
+	new Map(),
+	[gpByIndexDisp],
+	([gpByIndex], current) => claimPlayers(current, [...gpByIndex.keys()])
 );
 
-bindDispatcher(
-	gpByPlayerDisp,
+const gpByPlayerDisp = reducerEventDispatcher<GamepadByPlayerMap>()(
+	new Map(),
 	[gpByIndexDisp, indexByPlayerDisp],
 	([gpByIndex, indexByPlayer], current) => {
 		let changed = false;
@@ -159,10 +202,78 @@ bindDispatcher(
 	}
 );
 
-const gpByPlayerDispFamily = eventDispatcherFamily((player: number) => {
-	const disp = eventDispatcher<GamepadState | undefined>({ initialState: undefined });
-	bindDispatcher(disp, [gpByPlayerDisp], ([gpByPlayer]) => gpByPlayer.get(player));
-	return disp;
-});
+const gpByPlayerDispFamily = eventDispatcherFamily((player: number) =>
+	reducerEventDispatcher<GamepadState | undefined>()(undefined, [gpByPlayerDisp], ([gpByPlayer]) =>
+		gpByPlayer.get(player)
+	)
+);
 
+const EMPTY_BUTTON: GamepadButton = { pressed: false, touched: false, value: 0 };
+const EMPTY_CONTROLS: GamepadControls = {
+	axes: [],
+	buttons: [],
+};
+
+const pickLeastZero = (...values: readonly number[]): number =>
+	values.reduce((ret, val) => (Math.abs(val) > Math.abs(ret) ? val : ret), 0);
+
+const allGPControlsDist = reducerEventDispatcher<GamepadControls>()(
+	EMPTY_CONTROLS,
+	[gpByIndexDisp],
+	([gpByIndex]) => {
+		const axes: number[] = [];
+		const buttons: GamepadButton[] = [];
+
+		[...gpByIndex.values()].forEach((pad) => {
+			pad.axes.forEach((value, i) => {
+				axes[i] = pickLeastZero(axes[i] ?? 0, value);
+			});
+
+			pad.buttons.forEach((button, i) => {
+				const merged = buttons[i] ?? EMPTY_BUTTON;
+				buttons[i] = {
+					pressed: merged.pressed || button.pressed,
+					touched: merged.touched || button.touched,
+					value: pickLeastZero(merged.value, button.value),
+				};
+			});
+		});
+
+		return { axes, buttons };
+	}
+);
+
+const gamepadSticksEqual = (a: GamepadStick, b: GamepadStick): boolean =>
+	a.x === b.x && a.y === b.y;
+
+const allGPDirectionsDist = reducerEventDispatcher<GamepadStick>()(
+	{ x: 0, y: 0 },
+	[allGPControlsDist],
+	([{ axes, buttons }], current) => {
+		const ls: GamepadStick = {
+			x: axes[resolveAxisIndex("LEFT_STICK_X")] ?? 0,
+			y: axes[resolveAxisIndex("LEFT_STICK_Y")] ?? 0,
+		};
+		const rs: GamepadStick = {
+			x: axes[resolveAxisIndex("RIGHT_STICK_X")] ?? 0,
+			y: axes[resolveAxisIndex("RIGHT_STICK_Y")] ?? 0,
+		};
+
+		const up = buttons[resolveButtonIndex("DPAD_UP")]?.value || 0;
+		const down = buttons[resolveButtonIndex("DPAD_DOWN")]?.value || 0;
+		const left = buttons[resolveButtonIndex("DPAD_LEFT")]?.value || 0;
+		const right = buttons[resolveButtonIndex("DPAD_RIGHT")]?.value || 0;
+
+		const dp: GamepadStick = { x: right - left, y: down - up };
+
+		const next: GamepadStick = {
+			x: pickLeastZero(ls.x, rs.x, dp.x),
+			y: pickLeastZero(ls.y, rs.y, dp.y),
+		};
+
+		return gamepadSticksEqual(current, next) ? current : next;
+	}
+);
+
+export const allGamepadDirection = allGPDirectionsDist.getReadonly();
 export const gamepadByPlayerFamily = gpByPlayerDispFamily.getReadonly();
