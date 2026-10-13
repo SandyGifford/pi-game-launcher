@@ -9,6 +9,7 @@ import { useCallbackStable } from "../../hooks/useCallbackStable.hook";
 import { usePromise } from "../../hooks/usePromise.hook";
 import { useWindowHandler } from "../../hooks/useWindowHandler.hook";
 import { allGamepadDirection } from "../../utils/gamepad.utils";
+import { clamp } from "../../utils/numbers.utils";
 import { LaunchableButton } from "../LaunchableButton/LaunchableButton";
 import { OtherButton } from "../OtherButton/OtherButton";
 import classes from "./Homepage.module.scss";
@@ -60,14 +61,17 @@ export const Homepage: FC<HomepageProps> = memo(({ className }) => {
 			let colIndex = rowElements[rowIndex]?.findIndex((c) => c === focused);
 
 			if (rowIndex !== -1 && colIndex !== -1 && colIndex !== undefined) {
-				if (up) rowIndex = Math.max(0, rowIndex - 1);
-				if (down) rowIndex = Math.min(rows.length - 1, rowIndex + 1);
-				if (left) colIndex = Math.max(0, colIndex - 1);
-				if (right) colIndex = Math.min(rows.length - 1, colIndex + 1);
+				if (up) rowIndex = rowIndex - 1;
+				if (down) rowIndex = rowIndex + 1;
+				if (left) colIndex = colIndex - 1;
+				if (right) colIndex = colIndex + 1;
 			} else {
-				rowIndex = up ? rows.length - 1 : 0;
-				colIndex = left ? (rowElements[rowIndex]?.length ?? 0) - 1 : 0;
+				rowIndex = up ? Infinity : 0;
+				colIndex = left ? Infinity : 0;
 			}
+
+			rowIndex = clamp(rowIndex, 0, rowElements.length);
+			colIndex = clamp(colIndex, 0, rowElements[rowIndex]?.length ?? 0 - 1);
 
 			rowElements[rowIndex]?.[colIndex]?.focus();
 		}
