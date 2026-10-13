@@ -33,11 +33,11 @@ const runIsolated = (fns: readonly (() => unknown)[]): unknown[] => {
 };
 
 export function eventDispatcher<VALUE>(
-	options?: EventDispatcherOptions & { readonly initialState?: never }
-): EventDispatcher<VALUE>;
-export function eventDispatcher<VALUE>(
 	options: StatefulEventDispatcherOptions<VALUE>
 ): StatefulEventDispatcher<VALUE>;
+export function eventDispatcher<VALUE>(
+	options?: EventDispatcherOptions & { readonly initialState?: never }
+): EventDispatcher<VALUE>;
 export function eventDispatcher<VALUE>(
 	options: StatefulEventDispatcherOptions<VALUE> | EventDispatcherOptions = {}
 ): StatefulEventDispatcher<VALUE> | EventDispatcher<VALUE> {
