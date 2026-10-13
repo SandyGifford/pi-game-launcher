@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import type { FC } from "react";
-import { memo, useState } from "react";
+import { memo, useMemo, useState, useSyncExternalStore } from "react";
 import { getLaunchables, needsUpdate, updateAndReload } from "../../api";
 import { usePromise } from "../../hooks/usePromise.hook";
 import { useWindowHandler } from "../../hooks/useWindowHandler.hook";
@@ -9,6 +9,7 @@ import { OtherButton } from "../OtherButton/OtherButton";
 import classes from "./Homepage.module.scss";
 import { TransitionGroup } from "react-transition-group";
 import { awaitTime } from "@repo/shared";
+import { gamepadByPlayerFamily } from "../../utils/gamepad.utils";
 
 export type HomepageProps = {
 	readonly className?: string;
@@ -30,6 +31,9 @@ export const Homepage: FC<HomepageProps> = memo(({ className }) => {
 	const [thinkingID, setThinkingID] = useState<string>();
 
 	useWindowHandler(() => setThinkingID(undefined), [], "focus");
+	const playerDist = useMemo(() => gamepadByPlayerFamily(2), []);
+	const state = useSyncExternalStore(playerDist.onValue, playerDist.get);
+	console.log("=>", state);
 
 	return (
 		<div className={clsx("Homepage", className, classes.root, isReady && classes["root--ready"])}>

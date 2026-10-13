@@ -18,3 +18,9 @@ export class EventDispatcherMountError extends EventDispatcherMultiError {}
 
 /** An unmount listener or a mount cleanup threw. All of them still ran. */
 export class EventDispatcherUnmountError extends EventDispatcherMultiError {}
+
+/** An error during binding */
+export abstract class EventDispatcherBindingError extends EventDispatcherMultiError {}
+/** Something threw during binding's unsub phase */
+export class EventDispatcherBindingUnsubError extends EventDispatcherBindingError {}
+export class EventDispatcherBindingSubError extends EventDispatcherBindingError {}

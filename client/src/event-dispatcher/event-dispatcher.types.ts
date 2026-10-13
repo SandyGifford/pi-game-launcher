@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export type EventDispatcherType = "value" | "mount" | "unmount";
 export type EventDispatcherValueListener<VALUE> = (value: VALUE) => unknown;
 export type EventDispatcherMountListener = () => void | (() => unknown);
@@ -14,6 +15,9 @@ export type EventDispatcherOn<VALUE> = <TYPE extends EventDispatcherType>(
 	type: TYPE,
 	listener: EventDispatcherListenerTypeMap<VALUE>[TYPE]
 ) => EventDispatcherUnsub;
+export type EventDispatcherOnValue<VALUE> = (
+	listener: EventDispatcherValueListener<VALUE>
+) => EventDispatcherUnsub;
 
 export type EventDispatcherOff<VALUE> = <TYPE extends EventDispatcherType>(
 	type: TYPE,
@@ -28,6 +32,7 @@ export type EventDispatcherGetReadonly<VALUE> = () => ReadonlyEventDispatcher<VA
 
 export type ReadonlyEventDispatcher<VALUE> = {
 	readonly on: EventDispatcherOn<VALUE>;
+	readonly onValue: EventDispatcherOnValue<VALUE>;
 	readonly off: EventDispatcherOff<VALUE>;
 };
 
@@ -39,6 +44,15 @@ export type EventDispatcher<VALUE> = ReadonlyEventDispatcher<VALUE> & {
 export type ReadonlyStatefulEventDispatcher<VALUE> = ReadonlyEventDispatcher<VALUE> & {
 	readonly get: EventDispatcherGet<VALUE>;
 };
+
+export type ToReadonlyEventDispatcher<
+	DISP extends EventDispatcher<any> | StatefulEventDispatcher<any>,
+> =
+	DISP extends StatefulEventDispatcher<infer VALUE>
+		? ReadonlyStatefulEventDispatcher<VALUE>
+		: DISP extends EventDispatcher<infer VALUE>
+			? ReadonlyEventDispatcher<VALUE>
+			: never;
 
 export type StatefulEventDispatcher<VALUE> = EventDispatcher<VALUE> & {
 	readonly get: EventDispatcherGet<VALUE>;
@@ -56,8 +70,20 @@ export type EventDispatcherFamilyWithKeyOptions<PARAM, KEY> = EventDispatcherFam
 	readonly getKey: (param: PARAM) => KEY;
 };
 
-export type EventDispatcherFamily<PARAM, DISPATCHER extends EventDispatcher<never>, KEY> = {
+export type EventDispatcherFamilyRemove<KEY> = (key: KEY) => void;
+export type EventDispatcherFamilyClear = () => void;
+export type EventDispatcherFamilyGetReadonly<
+	PARAM,
+	DISPATCHER extends EventDispatcher<any>,
+> = () => ReadonlyEventDispatcherFamily<PARAM, DISPATCHER>;
+
+export type ReadonlyEventDispatcherFamily<PARAM, DISPATCHER extends EventDispatcher<any>> = {
+	(param: PARAM): ToReadonlyEventDispatcher<DISPATCHER>;
+};
+
+export type EventDispatcherFamily<PARAM, DISPATCHER extends EventDispatcher<any>, KEY> = {
 	(param: PARAM): DISPATCHER;
-	readonly remove: (key: KEY) => void;
-	readonly clear: () => void;
+	readonly remove: EventDispatcherFamilyRemove<KEY>;
+	readonly clear: EventDispatcherFamilyClear;
+	readonly getReadonly: EventDispatcherFamilyGetReadonly<PARAM, DISPATCHER>;
 };

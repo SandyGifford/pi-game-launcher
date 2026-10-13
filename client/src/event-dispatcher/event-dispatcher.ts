@@ -144,6 +144,7 @@ export function eventDispatcher<VALUE>(
 
 	const ro: ReadonlyEventDispatcher<VALUE> | ReadonlyStatefulEventDispatcher<VALUE> = {
 		on,
+		onValue: (listener) => on("value", listener),
 		off,
 		...(stateful ? { get: () => state } : {}),
 	};

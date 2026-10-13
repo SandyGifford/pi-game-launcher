@@ -1,6 +1,30 @@
 import { eventDispatcher } from "../event-dispatcher/event-dispatcher";
+import { eventDispatcherFamily } from "../event-dispatcher/event-dispatcher-family";
+import { bindDispatcher } from "../event-dispatcher/event-dispatcher.utils";
 
 export type GamepadState = Omit<Gamepad, "vibrationActuator">;
+type GamepadByIndexMap = ReadonlyMap<number, GamepadState>;
+type GamepadIndexByPlayerMap = ReadonlyMap<number, number>;
+type GamepadByPlayerMap = ReadonlyMap<number, GamepadState>;
+
+// Gives each not-yet-claimed index the lowest free player number; existing claims never move.
+const claimPlayers = (
+	claims: ReadonlyMap<number, number>,
+	indexes: readonly number[]
+): ReadonlyMap<number, number> => {
+	const claimed = new Set(claims.values());
+	const unclaimed = indexes.filter((index) => !claimed.has(index));
+	if (!unclaimed.length) return claims;
+
+	const next = new Map(claims);
+	unclaimed.forEach((index) => {
+		const player = Array.from({ length: next.size + 1 }, (_, i) => i + 1).find(
+			(p) => !next.has(p)
+		)!;
+		next.set(player, index);
+	});
+	return next;
+};
 
 const mergeArrays = <T>(
 	arr: readonly T[],
@@ -31,7 +55,7 @@ const copyButton = (btn: GamepadButton): GamepadButton => ({
 	value: btn.value,
 });
 
-const getGamepadState = (gp: Gamepad, old?: GamepadState): GamepadState => {
+const getGamepadState = (gp: Gamepad | GamepadState, old?: GamepadState): GamepadState => {
 	const axes = mergeArrays([...gp.axes], old?.axes);
 	const buttons = mergeArrays(gp.buttons.map(copyButton), old?.buttons, sameButton);
 
@@ -58,7 +82,7 @@ const getGamepadState = (gp: Gamepad, old?: GamepadState): GamepadState => {
 	};
 };
 
-const gpByIndexDisp = eventDispatcher<ReadonlyMap<number, GamepadState>>({
+const gpByIndexDisp = eventDispatcher<GamepadByIndexMap>({
 	initialState: new Map(),
 });
 gpByIndexDisp.on("mount", () => {
@@ -93,11 +117,6 @@ gpByIndexDisp.on("mount", () => {
 			nextIndexes.some((index, position) => index !== prevIndexes[position]);
 
 		if (changed || indexesChanged) gpByIndexDisp.fire(next);
-		if (indexesChanged) {
-			// update claims
-			// update individual gamepads
-			// etc etc
-		}
 	};
 	// If the first frame throws we never return the cleanup, so cancel the queued frame ourselves.
 	try {
@@ -110,3 +129,40 @@ gpByIndexDisp.on("mount", () => {
 		cancelAnimationFrame(frameId);
 	};
 });
+
+const indexByPlayerDisp = eventDispatcher<GamepadIndexByPlayerMap>({ initialState: new Map() });
+const gpByPlayerDisp = eventDispatcher<GamepadByPlayerMap>({ initialState: new Map() });
+
+bindDispatcher(indexByPlayerDisp, [gpByIndexDisp], ([gpByIndex], current) =>
+	claimPlayers(current, [...gpByIndex.keys()])
+);
+
+bindDispatcher(
+	gpByPlayerDisp,
+	[gpByIndexDisp, indexByPlayerDisp],
+	([gpByIndex, indexByPlayer], current) => {
+		let changed = false;
+		const next = [...indexByPlayer.entries()].reduce((map, [player, index]) => {
+			const gp = gpByIndex.get(index);
+			if (gp) {
+				const gps = getGamepadState(gp, current.get(player));
+				if (gp !== gps) {
+					map.set(player, gps);
+					changed = true;
+				}
+			}
+			return map;
+		}, new Map<number, GamepadState>());
+
+		if (changed) return next;
+		return current;
+	}
+);
+
+const gpByPlayerDispFamily = eventDispatcherFamily((player: number) => {
+	const disp = eventDispatcher<GamepadState | undefined>({ initialState: undefined });
+	bindDispatcher(disp, [gpByPlayerDisp], ([gpByPlayer]) => gpByPlayer.get(player));
+	return disp;
+});
+
+export const gamepadByPlayerFamily = gpByPlayerDispFamily.getReadonly();
