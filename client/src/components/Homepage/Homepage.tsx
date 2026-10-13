@@ -71,7 +71,7 @@ export const Homepage: FC<HomepageProps> = memo(({ className }) => {
 			}
 
 			rowIndex = clamp(rowIndex, 0, rowElements.length);
-			colIndex = clamp(colIndex, 0, rowElements[rowIndex]?.length ?? 0 - 1);
+			colIndex = clamp(colIndex, 0, (rowElements[rowIndex]?.length ?? 0) - 1);
 
 			rowElements[rowIndex]?.[colIndex]?.focus();
 		}
