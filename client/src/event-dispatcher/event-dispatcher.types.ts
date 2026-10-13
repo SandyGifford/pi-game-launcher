@@ -34,6 +34,7 @@ export type ReadonlyEventDispatcher<VALUE> = {
 	readonly on: EventDispatcherOn<VALUE>;
 	readonly onValue: EventDispatcherOnValue<VALUE>;
 	readonly off: EventDispatcherOff<VALUE>;
+	readonly get: EventDispatcherGet<VALUE>;
 };
 
 export type EventDispatcher<VALUE> = ReadonlyEventDispatcher<VALUE> & {
@@ -41,27 +42,10 @@ export type EventDispatcher<VALUE> = ReadonlyEventDispatcher<VALUE> & {
 	readonly getReadonly: EventDispatcherGetReadonly<VALUE>;
 };
 
-export type ReadonlyStatefulEventDispatcher<VALUE> = ReadonlyEventDispatcher<VALUE> & {
-	readonly get: EventDispatcherGet<VALUE>;
-};
+export type ToReadonlyEventDispatcher<DISP extends EventDispatcher<any>> =
+	DISP extends EventDispatcher<infer VALUE> ? ReadonlyEventDispatcher<VALUE> : never;
 
-export type ToReadonlyEventDispatcher<
-	DISP extends EventDispatcher<any> | StatefulEventDispatcher<any>,
-> =
-	DISP extends StatefulEventDispatcher<infer VALUE>
-		? ReadonlyStatefulEventDispatcher<VALUE>
-		: DISP extends EventDispatcher<infer VALUE>
-			? ReadonlyEventDispatcher<VALUE>
-			: never;
-
-export type StatefulEventDispatcher<VALUE> = EventDispatcher<VALUE> & {
-	readonly get: EventDispatcherGet<VALUE>;
-};
-
-export type EventDispatcherOptions = object;
-
-export type StatefulEventDispatcherOptions<VALUE> = EventDispatcherOptions & {
-	readonly initialState: VALUE;
+export type EventDispatcherOptions = {
 	readonly reportStateImmediately?: boolean;
 };
 

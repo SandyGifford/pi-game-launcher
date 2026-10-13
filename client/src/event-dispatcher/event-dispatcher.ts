@@ -15,9 +15,6 @@ import type {
 	EventDispatcherType,
 	EventDispatcherValueListener,
 	ReadonlyEventDispatcher,
-	ReadonlyStatefulEventDispatcher,
-	StatefulEventDispatcher,
-	StatefulEventDispatcherOptions,
 } from "./event-dispatcher.types";
 
 const runIsolated = (fns: readonly (() => unknown)[]): unknown[] => {
@@ -32,18 +29,12 @@ const runIsolated = (fns: readonly (() => unknown)[]): unknown[] => {
 	return errors;
 };
 
-export function eventDispatcher<VALUE>(
-	options: StatefulEventDispatcherOptions<VALUE>
-): StatefulEventDispatcher<VALUE>;
-export function eventDispatcher<VALUE>(
-	options?: EventDispatcherOptions & { readonly initialState?: never }
-): EventDispatcher<VALUE>;
-export function eventDispatcher<VALUE>(
-	options: StatefulEventDispatcherOptions<VALUE> | EventDispatcherOptions = {}
-): StatefulEventDispatcher<VALUE> | EventDispatcher<VALUE> {
-	const stateful = "initialState" in options;
-	let state = stateful ? options.initialState : undefined;
-	const reportStateImmediately = stateful ? !!options.reportStateImmediately : false;
+export const eventDispatcher = <VALUE>(
+	initialState: VALUE,
+	options: EventDispatcherOptions = {}
+): EventDispatcher<VALUE> => {
+	let state = initialState;
+	const { reportStateImmediately } = options;
 
 	const listeners: {
 		readonly [TYPE in EventDispatcherType]: Set<EventDispatcherListenerTypeMap<VALUE>[TYPE]>;
@@ -136,17 +127,17 @@ export function eventDispatcher<VALUE>(
 	};
 
 	const fire: EventDispatcherFire<VALUE> = (value) => {
-		if (stateful) state = value;
+		state = value;
 		// A throwing listener must not starve the others; all errors are reported together afterwards.
 		const errors = runIsolated([...listeners.value].map((l) => () => l(value)));
 		if (errors.length) throw new EventDispatcherListenerError("Value listeners threw", errors);
 	};
 
-	const ro: ReadonlyEventDispatcher<VALUE> | ReadonlyStatefulEventDispatcher<VALUE> = {
+	const ro: ReadonlyEventDispatcher<VALUE> = {
 		on,
 		onValue: (listener) => on("value", listener),
 		off,
-		...(stateful ? { get: () => state } : {}),
+		get: () => state,
 	};
 
 	const getReadonly: EventDispatcherGetReadonly<VALUE> = () => ro;
@@ -156,4 +147,4 @@ export function eventDispatcher<VALUE>(
 		fire,
 		getReadonly,
 	};
-}
+};

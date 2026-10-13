@@ -3,22 +3,17 @@ import {
 	EventDispatcherBindingUnsubError,
 } from "./event-dispatcher.errors";
 import type {
+	EventDispatcher,
 	EventDispatcherUnsub,
-	ReadonlyStatefulEventDispatcher,
-	StatefulEventDispatcher,
+	ReadonlyEventDispatcher,
 } from "./event-dispatcher.types";
 
-export type EventDispatcherArrayValues<
-	S extends readonly ReadonlyStatefulEventDispatcher<unknown>[],
-> = {
-	[K in keyof S]: S[K] extends ReadonlyStatefulEventDispatcher<infer V> ? V : never;
+export type EventDispatcherArrayValues<S extends readonly ReadonlyEventDispatcher<unknown>[]> = {
+	[K in keyof S]: S[K] extends ReadonlyEventDispatcher<infer V> ? V : never;
 };
 
-export const bindDispatcher = <
-	const S extends readonly ReadonlyStatefulEventDispatcher<unknown>[],
-	TARGET,
->(
-	target: StatefulEventDispatcher<TARGET>,
+export const bindDispatcher = <const S extends readonly ReadonlyEventDispatcher<unknown>[], TARGET>(
+	target: EventDispatcher<TARGET>,
 	sources: S,
 	project: (values: EventDispatcherArrayValues<S>, current: TARGET) => TARGET,
 	areEqual: (a: TARGET, b: TARGET) => boolean = Object.is
