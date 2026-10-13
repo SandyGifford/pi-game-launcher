@@ -3,7 +3,7 @@ import { CLIENT_DIST_DIR, LAUNCHABLES, LAUNCHABLES_MAP, STATIC_DIR } from "./con
 import { APIError } from "./errors.ts";
 import { gitIsBehind, updateFromGit } from "./git.utils.ts";
 import { updateFromNpm } from "./npm.utils.ts";
-import { isLaunchableId, launch } from "./utils.ts";
+import { isLaunchableId, launch, restart, shutdown } from "./utils.ts";
 
 const app = express();
 const port = Number(process.env["PORT"] ?? 3000);
@@ -46,6 +46,9 @@ app.post("/api/update", async (req, res) => {
 	});
 	setTimeout(() => process.exit(0), 5000).unref();
 });
+
+app.post("/api/shutdown", shutdown);
+app.post("/api/restart", restart);
 
 // icons and other static assets, then the built client (see client/vite.config.ts)
 app.use(express.static(STATIC_DIR));

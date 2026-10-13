@@ -1,4 +1,5 @@
 import {
+	awaitTime,
 	parseToPrimitive,
 	type Launchable,
 	type LaunchableID,
@@ -37,7 +38,7 @@ export type ProcessResult = {
 	readonly code: number | null;
 };
 
-const spawnChild = (command: string, args: readonly string[], options: SpawnOptions) =>
+const spawnChild = (command: string, args: readonly string[], options?: SpawnOptions) =>
 	new Promise<ChildProcess>((resolveSpawn, rejectSpawn) => {
 		const child = spawn(command, args, { cwd: ROOT_DIR, ...options });
 
@@ -87,4 +88,15 @@ export const processNewLaunchables = (
 export const isLaunchableId = (id: unknown): id is LaunchableID => {
 	if (typeof id !== "string") return false;
 	return id in LAUNCHABLES_MAP;
+};
+
+export const shutdown = async () => {
+	// await spawnChild("shutdown", ["-h", "now"]);
+	await awaitTime(1000);
+	console.log("=>", "shutdown");
+};
+export const restart = async () => {
+	// await spawnChild("reboot", []);
+	await awaitTime(1000);
+	console.log("=>", "restart");
 };

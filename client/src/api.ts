@@ -30,3 +30,11 @@ export const getLaunchables = async (): Promise<readonly Launchable[]> =>
 
 export const needsUpdate = async (): Promise<boolean> =>
 	fetch("/api/needs-update").then((r) => r.json());
+
+export const shutdown = async (): Promise<void> => {
+	await fetch("/api/shutdown", { method: "POST" });
+};
+
+export const restart = async (): Promise<void> => {
+	await fetch("/api/restart", { method: "POST" });
+};

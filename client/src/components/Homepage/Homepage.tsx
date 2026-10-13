@@ -3,7 +3,7 @@ import clsx from "clsx";
 import type { FC } from "react";
 import { memo, useEffect, useRef, useState } from "react";
 import { TransitionGroup } from "react-transition-group";
-import { getLaunchables, needsUpdate, updateAndReload } from "../../api";
+import { getLaunchables, needsUpdate, restart, shutdown, updateAndReload } from "../../api";
 import { useAlwaysRef } from "../../hooks/useAlwaysRef.hook";
 import { useCallbackStable } from "../../hooks/useCallbackStable.hook";
 import { usePromise } from "../../hooks/usePromise.hook";
@@ -151,6 +151,24 @@ export const Homepage: FC<HomepageProps> = memo(({ className }) => {
 						onClick={async () => {}}
 					>
 						configure
+					</OtherButton>
+					<OtherButton
+						key="shutdown"
+						thinkingId="SHUTDOWN"
+						currentThinkingId={thinkingID}
+						setCurrentThinkingId={setThinkingID}
+						onClick={shutdown}
+					>
+						shutdown
+					</OtherButton>
+					<OtherButton
+						key="restart"
+						thinkingId="RESTART"
+						currentThinkingId={thinkingID}
+						setCurrentThinkingId={setThinkingID}
+						onClick={restart}
+					>
+						restart
 					</OtherButton>
 				</div>
 			</TransitionGroup>
