@@ -31,9 +31,7 @@ export type ReadonlyEventDispatcher<VALUE> = {
 	readonly off: EventDispatcherOff<VALUE>;
 };
 
-export type EventDispatcher<VALUE> = {
-	readonly on: EventDispatcherOn<VALUE>;
-	readonly off: EventDispatcherOff<VALUE>;
+export type EventDispatcher<VALUE> = ReadonlyEventDispatcher<VALUE> & {
 	readonly fire: EventDispatcherFire<VALUE>;
 	readonly getReadonly: EventDispatcherGetReadonly<VALUE>;
 };
@@ -124,23 +122,19 @@ export function createEventDispatcher<VALUE>(
 	};
 }
 
-export type EventDispatcherValue<DISPATCHER> =
-	DISPATCHER extends EventDispatcher<infer VALUE> ? VALUE : never;
-
-export type EventDispatcherFamily<PARAM, DISPATCHER extends EventDispatcher<never>> = {
-	(
-		value: PARAM,
-		firstListener: EventDispatcherValueListener<EventDispatcherValue<DISPATCHER>>
-	): DISPATCHER;
+export type EventDispatcherFamily<PARAM, DISPATCHER extends EventDispatcher<never>, KEY> = {
+	(param: PARAM): DISPATCHER;
+	readonly remove: (key: KEY) => void;
+	readonly clear: () => void;
 };
 
 export function eventDispatcherFamily<PARAM, DISPATCHER extends EventDispatcher<never>>(
 	fn: (param: PARAM) => DISPATCHER
-): EventDispatcherFamily<PARAM, DISPATCHER>;
+): EventDispatcherFamily<PARAM, DISPATCHER, PARAM>;
 export function eventDispatcherFamily<PARAM, DISPATCHER extends EventDispatcher<never>, KEY>(
 	fn: (param: PARAM) => DISPATCHER,
 	getKey: (param: PARAM) => KEY
-): EventDispatcherFamily<PARAM, DISPATCHER>;
+): EventDispatcherFamily<PARAM, DISPATCHER, KEY>;
 export function eventDispatcherFamily<
 	PARAM,
 	DISPATCHER extends EventDispatcher<never>,
@@ -148,22 +142,24 @@ export function eventDispatcherFamily<
 >(
 	fn: (param: PARAM) => DISPATCHER,
 	getKey: (param: PARAM) => KEY = (param) => param as unknown as KEY
-): EventDispatcherFamily<PARAM, DISPATCHER> {
-	const map = new Map<unknown, DISPATCHER>();
-	return (param, firstListener) => {
-		const key = getKey(param);
-		const existing = map.get(key);
-		if (existing) {
-			existing.on("value", firstListener);
-			return existing;
-		}
+): EventDispatcherFamily<PARAM, DISPATCHER, KEY> {
+	const map = new Map<KEY, DISPATCHER>();
+	return Object.assign(
+		(param: PARAM) => {
+			const key = getKey(param);
+			const existing = map.get(key);
+			if (existing) return existing;
 
-		const dispatcher = fn(param);
-		map.set(key, dispatcher);
-		dispatcher.on("unmount", () => {
-			if (map.get(key) === dispatcher) map.delete(key);
-		});
-		dispatcher.on("value", firstListener);
-		return dispatcher;
-	};
+			const dispatcher = fn(param);
+			map.set(key, dispatcher);
+			dispatcher.on("unmount", () => {
+				if (map.get(key) === dispatcher) map.delete(key);
+			});
+			return dispatcher;
+		},
+		{
+			remove: (key: KEY) => map.delete(key),
+			clear: () => map.clear(),
+		}
+	);
 }
