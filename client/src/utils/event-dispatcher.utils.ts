@@ -24,11 +24,24 @@ export type EventDispatcherFire<VALUE> = (value: VALUE) => void;
 
 export type EventDispatcherGet<VALUE> = () => VALUE;
 
+export type EventDispatcherGetReadonly<VALUE> = () => ReadonlyEventDispatcher<VALUE>;
+
+export type ReadonlyEventDispatcher<VALUE> = {
+	readonly on: EventDispatcherOn<VALUE>;
+	readonly off: EventDispatcherOff<VALUE>;
+};
+
 export type EventDispatcher<VALUE> = {
 	readonly on: EventDispatcherOn<VALUE>;
 	readonly off: EventDispatcherOff<VALUE>;
 	readonly fire: EventDispatcherFire<VALUE>;
+	readonly getReadonly: EventDispatcherGetReadonly<VALUE>;
 };
+
+export type ReadonlyStatefulEventDispatcher<VALUE> = ReadonlyEventDispatcher<VALUE> & {
+	readonly get: EventDispatcherGet<VALUE>;
+};
+
 export type StatefulEventDispatcher<VALUE> = EventDispatcher<VALUE> & {
 	readonly get: EventDispatcherGet<VALUE>;
 };
@@ -96,10 +109,17 @@ export function createEventDispatcher<VALUE>(
 		listeners.value.forEach((l) => l(value));
 	};
 
-	return {
+	const ro: ReadonlyEventDispatcher<VALUE> | ReadonlyStatefulEventDispatcher<VALUE> = {
 		on,
 		off,
-		fire,
 		...(stateful ? { get: () => state } : {}),
+	};
+
+	const getReadonly: EventDispatcherGetReadonly<VALUE> = () => ro;
+
+	return {
+		...ro,
+		fire,
+		getReadonly,
 	};
 }
