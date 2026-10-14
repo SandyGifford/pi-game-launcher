@@ -13,6 +13,7 @@ import { clamp } from "../../utils/numbers.utils";
 import { LaunchableButton } from "../LaunchableButton/LaunchableButton";
 import { OtherButton } from "../OtherButton/OtherButton";
 import classes from "./Homepage.module.scss";
+import { useAppContext } from "../../contexts/AppContext.ctx";
 
 export type HomepageProps = {
 	readonly className?: string;
@@ -50,6 +51,7 @@ const findClosestElementIndex = (position: number, els: readonly HTMLElement[]):
 };
 
 export const Homepage: FC<HomepageProps> = memo(({ className }) => {
+	const { setView } = useAppContext();
 	const rowRefs = [useRef<HTMLDivElement>(null), useRef<HTMLDivElement>(null)] as const;
 	const rowRefsRef = useAlwaysRef(rowRefs);
 
@@ -211,6 +213,14 @@ export const Homepage: FC<HomepageProps> = memo(({ className }) => {
 						onClick={restart}
 					>
 						restart
+					</OtherButton>
+					<OtherButton
+						key="test"
+						currentThinkingId={thinkingID}
+						setCurrentThinkingId={setThinkingID}
+						onClick={() => setView("WEB", "https://reddit.com")}
+					>
+						test
 					</OtherButton>
 				</div>
 			</TransitionGroup>

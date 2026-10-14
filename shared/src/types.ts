@@ -22,7 +22,10 @@ export type ShellLaunchable = LaunchableBase<"SHELL"> & {
 	readonly scriptPath: string;
 	readonly launchArguments?: LaunchableArguments;
 };
-export type URLLaunchable = LaunchableBase<"URL"> & { readonly url: string };
+export type URLLaunchable = LaunchableBase<"URL"> & {
+	readonly url: string;
+	readonly noFrame?: boolean;
+};
 
 export type Launchable = AppLaunchable | ShellLaunchable | URLLaunchable;
 export type LaunchableType = Launchable["type"];

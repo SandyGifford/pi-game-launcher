@@ -1,0 +1,27 @@
+@use "../../fn.scss";
+
+.root {
+	transition: fn.transition(opacity, transform);
+	opacity: 1;
+	transform: none;
+  position: absolute;
+  min-width: 100%;
+  min-height: 100%;
+
+	&--enter {
+		opacity: 0;
+		transform: translateX(-100%);
+	}
+
+	&--exit,
+	&--enter-done,
+	&--enter-active {
+		opacity: 1;
+		transform: none;
+	}
+	&--exit-active,
+	&--exit-done {
+		opacity: 0;
+		transform: translateX(100%);
+	}
+}
