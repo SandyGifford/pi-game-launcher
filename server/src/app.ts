@@ -3,9 +3,11 @@ import { CLIENT_DIST_DIR, LAUNCHABLES, LAUNCHABLES_MAP, STATIC_DIR } from "./con
 import { APIError } from "./errors.ts";
 import { gitIsBehind, updateFromGit } from "./git.utils.ts";
 import { updateFromNpm } from "./npm.utils.ts";
-import { isLaunchableId, launch, restart, shutdown } from "./utils.ts";
+import { getEnvironmentValue, isLaunchableId, launch, restart, shutdown } from "./utils.ts";
 
 const app = express();
+
+const AUTO_UPDATE = getEnvironmentValue("AUTO_UPDATES", "boolean");
 
 app.post("/api/launch/:id", async (req, res) => {
 	const res500 = (message: string) => res.status(500).send({ type: "ERROR", message });
@@ -29,9 +31,7 @@ app.post("/api/launch/:id", async (req, res) => {
 
 app.get("/api/launchables", async (req, res) => res.send(LAUNCHABLES));
 
-app.get("/api/needs-update", async (req, res) => {
-	res.send(await gitIsBehind());
-});
+app.get("/api/needs-update", async (req, res) => res.send(!!AUTO_UPDATE && (await gitIsBehind())));
 
 app.post("/api/update", async (req, res) => {
 	await updateFromGit();
