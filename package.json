@@ -12,7 +12,7 @@
     "server",
     "shared",
     "shared-node",
-    "infra"
+    "startup"
   ],
   "scripts": {
     "dev": "concurrently -k -n server,client \"npm run dev -w @repo/server\" \"npm run dev -w @repo/client\"",

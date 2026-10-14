@@ -1,7 +1,7 @@
 {
-  "name": "@repo/infra",
+  "name": "@repo/startup",
   "version": "1.0.0",
-  "description": "infrastructure",
+  "description": "startup: updates and launch",
   "private": true,
   "type": "module",
   "engines": {

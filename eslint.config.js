@@ -12,8 +12,8 @@ const CROSS_PACKAGE_PATTERNS = [
   "../**/shared/**",
   "../**/shared-node",
   "../**/shared-node/**",
-  "../**/infra",
-  "../**/infra/**",
+  "../**/startup",
+  "../**/startup/**",
 ];
 
 const restrict = (names, message) => ({
@@ -83,7 +83,7 @@ export default [
     },
   },
 
-  // Dependency direction: client -> shared; server -> shared/shared-node; shared-node -> shared; infra -> shared/shared-node; shared -> nothing
+  // Dependency direction: client -> shared; server -> shared/shared-node; shared-node -> shared; startup -> shared/shared-node; shared -> nothing
   {
     files: ["client/**/*.{js,jsx,ts,tsx}"],
     plugins: { "react-hooks": reactHooks },
@@ -96,37 +96,37 @@ export default [
       "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": "error",
       ...restrict(
-        ["@repo/server", "@repo/infra", "@repo/shared-node"],
-        "The client may depend only on @repo/shared, not @repo/server, @repo/infra, or @repo/shared-node."
+        ["@repo/server", "@repo/startup", "@repo/shared-node"],
+        "The client may depend only on @repo/shared, not @repo/server, @repo/startup, or @repo/shared-node."
       ),
     },
   },
   {
     files: ["server/**/*.{js,jsx,ts,tsx}"],
     rules: restrict(
-      ["@repo/client", "@repo/infra"],
-      "The server may depend on @repo/shared and @repo/shared-node, not @repo/client or @repo/infra."
+      ["@repo/client", "@repo/startup"],
+      "The server may depend on @repo/shared and @repo/shared-node, not @repo/client or @repo/startup."
     ),
   },
   {
     files: ["shared/**/*.{js,jsx,ts,tsx}"],
     rules: restrict(
-      ["@repo/client", "@repo/server", "@repo/infra", "@repo/shared-node"],
+      ["@repo/client", "@repo/server", "@repo/startup", "@repo/shared-node"],
       "The shared package must not depend on other workspace packages."
     ),
   },
   {
     files: ["shared-node/**/*.{js,jsx,ts,tsx}"],
     rules: restrict(
-      ["@repo/client", "@repo/server", "@repo/infra"],
-      "The shared-node package may depend on @repo/shared, not @repo/client, @repo/server, or @repo/infra."
+      ["@repo/client", "@repo/server", "@repo/startup"],
+      "The shared-node package may depend on @repo/shared, not @repo/client, @repo/server, or @repo/startup."
     ),
   },
   {
-    files: ["infra/**/*.{js,jsx,ts,tsx}"],
+    files: ["startup/**/*.{js,jsx,ts,tsx}"],
     rules: restrict(
       ["@repo/client", "@repo/server"],
-      "The infra package may depend on @repo/shared and @repo/shared-node, not @repo/client or @repo/server."
+      "The startup package may depend on @repo/shared and @repo/shared-node, not @repo/client or @repo/server."
     ),
   },
 
