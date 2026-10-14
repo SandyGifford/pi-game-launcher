@@ -20,6 +20,35 @@ export type HomepageProps = {
 
 const STICK_THRESHOLD = 0.5;
 
+const getElementCenter = (el: HTMLElement) => {
+	const { left, width } = el.getBoundingClientRect();
+	return left + width / 2;
+};
+
+const findClosestElementIndex = (position: number, els: readonly HTMLElement[]): number => {
+	const firstIndexOver = els.findIndex((el) => getElementCenter(el) > position);
+
+	const beforeIndex = firstIndexOver - 1;
+	const afterIndex = firstIndexOver;
+
+	if (afterIndex < 0) return els.length - 1;
+	if (beforeIndex < 0) return 0;
+
+	const before = els[beforeIndex];
+	const after = els[afterIndex];
+
+	if (!after) return els.length - 1;
+	if (!before) return 0;
+
+	const beforePosition = getElementCenter(before);
+	const afterPosition = getElementCenter(after);
+
+	const beforeDist = Math.abs(position - beforePosition);
+	const afterDist = Math.abs(position - afterPosition);
+
+	return beforeDist < afterDist ? beforeIndex : afterIndex;
+};
+
 export const Homepage: FC<HomepageProps> = memo(({ className }) => {
 	const rowRefs = [useRef<HTMLDivElement>(null), useRef<HTMLDivElement>(null)] as const;
 	const rowRefsRef = useAlwaysRef(rowRefs);
@@ -60,9 +89,22 @@ export const Homepage: FC<HomepageProps> = memo(({ className }) => {
 			let rowIndex = rows.findIndex((r) => r.current?.contains(focused));
 			let colIndex = rowElements[rowIndex]?.findIndex((c) => c === focused);
 
-			if (rowIndex !== -1 && colIndex !== -1 && colIndex !== undefined) {
-				if (up) rowIndex = rowIndex - 1;
-				if (down) rowIndex = rowIndex + 1;
+			if (
+				focused instanceof HTMLElement &&
+				rowIndex !== -1 &&
+				colIndex !== -1 &&
+				colIndex !== undefined
+			) {
+				const changeRow = (row: number) => {
+					row = clamp(row, 0, rowElements.length - 1);
+					const currentPosition = getElementCenter(focused);
+					rowIndex = row;
+					const buttons = rowElements[rowIndex];
+					if (buttons) colIndex = findClosestElementIndex(currentPosition, buttons);
+				};
+
+				if (up) changeRow(rowIndex - 1);
+				if (down) changeRow(rowIndex + 1);
 				if (left) colIndex = colIndex - 1;
 				if (right) colIndex = colIndex + 1;
 			} else {
@@ -70,7 +112,7 @@ export const Homepage: FC<HomepageProps> = memo(({ className }) => {
 				colIndex = left ? Infinity : 0;
 			}
 
-			rowIndex = clamp(rowIndex, 0, rowElements.length);
+			rowIndex = clamp(rowIndex, 0, rowElements.length - 1);
 			colIndex = clamp(colIndex, 0, (rowElements[rowIndex]?.length ?? 0) - 1);
 
 			rowElements[rowIndex]?.[colIndex]?.focus();
