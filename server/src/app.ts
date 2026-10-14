@@ -1,13 +1,10 @@
 import express from "express";
-import { CLIENT_DIST_DIR, LAUNCHABLES, LAUNCHABLES_MAP, STATIC_DIR } from "./consts.ts";
+import { LAUNCHABLES, LAUNCHABLES_MAP } from "./consts.ts";
 import { APIError } from "./errors.ts";
-import { gitIsBehind, updateFromGit } from "./git.utils.ts";
-import { updateFromNpm } from "./npm.utils.ts";
-import { getEnvironmentValue, isLaunchableId, launch, restart, shutdown } from "./utils.ts";
+import { isLaunchableId, launch, restart, shutdown } from "./utils.ts";
+import { CLIENT_DIST_DIR, STATIC_DIR } from "@repo/shared-node";
 
 const app = express();
-
-const AUTO_UPDATE = getEnvironmentValue("AUTO_UPDATES", "boolean");
 
 app.post("/api/launch/:id", async (req, res) => {
 	const res500 = (message: string) => res.status(500).send({ type: "ERROR", message });
@@ -31,19 +28,11 @@ app.post("/api/launch/:id", async (req, res) => {
 
 app.get("/api/launchables", async (req, res) => res.send(LAUNCHABLES));
 
-app.get("/api/needs-update", async (req, res) => res.send(!!AUTO_UPDATE && (await gitIsBehind())));
+// eventually this will check for system updates
+app.get("/api/needs-update", async (req, res) => res.send(false));
 
-app.post("/api/update", async (req, res) => {
-	await updateFromGit();
-	await updateFromNpm();
-	res.send();
-
-	// exit once the response is sent; pm2 restarts the server on the new code
-	res.on("finish", () => {
-		req.socket.server?.close(() => process.exit(0));
-	});
-	setTimeout(() => process.exit(0), 5000).unref();
-});
+// eventually this will run system updates
+app.post("/api/update", async (req, res) => res.send());
 
 app.post("/api/shutdown", shutdown);
 app.post("/api/restart", restart);

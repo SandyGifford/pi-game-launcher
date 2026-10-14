@@ -1,7 +1,6 @@
-import { APIError } from "./errors.ts";
 import { launchProcess } from "./utils.ts";
 
-export class GitError extends APIError {}
+export class GitError extends Error {}
 export class GitAheadError extends GitError {
 	public readonly aheadCount: number;
 
@@ -20,12 +19,13 @@ export const gitFetch = () => launchProcess("git", ["fetch"]);
 export const gitIsBehind = async () => {
 	await gitFetch();
 	const { stdout } = await launchProcess("git", ["status", "-sb"]);
+	const status = stdout.trimEnd();
 	const [, aheadStr, behindStr] =
-		stdout.match(/\[(?:(?:ahead (\d)(?:, )?)?(?:behind (\d))?)\]$/) || [];
+		status.match(/\[(?:(?:ahead (\d+)(?:, )?)?(?:behind (\d+))?)\]$/) || [];
 	const ahead = Number(aheadStr);
 	const behind = Number(behindStr);
 	if (!isNaN(ahead) && ahead) throw new GitAheadError(ahead);
-	const [goneStr] = stdout.match(/\[gone\]$/) || [];
+	const [goneStr] = status.match(/\[gone\]$/) || [];
 	const gone = !!goneStr;
 	if (gone) throw new GitRepoGoneError();
 	return !!behind;

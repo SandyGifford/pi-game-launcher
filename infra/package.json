@@ -1,0 +1,21 @@
+{
+  "name": "@repo/infra",
+  "version": "1.0.0",
+  "description": "infrastructure",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=26"
+  },
+  "scripts": {
+    "start": "node src/startup.ts",
+    "typecheck": "tsc"
+  },
+  "dependencies": {
+    "@repo/shared": "*",
+    "@repo/shared-node": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^26.5.0"
+  }
+}

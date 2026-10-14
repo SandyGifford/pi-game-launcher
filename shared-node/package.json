@@ -1,0 +1,17 @@
+{
+  "name": "@repo/shared-node",
+  "version": "1.0.0",
+  "description": "Things sharable between node packages",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@repo/shared": "*"
+  }
+}
