@@ -30,13 +30,16 @@ export const gitIsBehind = async () => {
 	if (gone) throw new GitRepoGoneError();
 	return !!behind;
 };
+export const getHeadSha = async () =>
+	(await launchProcess("git", ["rev-parse", "HEAD"])).stdout.trim();
 export const gitPull = async () => {
 	await gitFetch();
 	return launchProcess("git", ["pull"]);
 };
 
-export const updateFromGit = async () => {
+export const updateFromGit = async (): Promise<boolean> => {
 	const behind = await gitIsBehind();
-	if (!behind) return;
+	if (!behind) return false;
 	await gitPull();
+	return true;
 };

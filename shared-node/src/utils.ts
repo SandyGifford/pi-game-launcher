@@ -1,7 +1,9 @@
 import { parseToPrimitive, type PrimitiveType, type PrimitiveTypeMap } from "@repo/shared";
 import { spawn, type ChildProcess, type SpawnOptions } from "node:child_process";
-import { ROOT_DIR } from "./consts.ts";
-import { updateFromGit } from "./git.utils.ts";
+import { existsSync } from "node:fs";
+import { readFile, writeFile } from "node:fs/promises";
+import { BUILT_SHA_PATH, CLIENT_DIST_DIR, ROOT_DIR } from "./consts.ts";
+import { getHeadSha, updateFromGit } from "./git.utils.ts";
 import { updateFromNpm } from "./npm.utils.ts";
 
 export function getEnvironmentValue(name: string): string;
@@ -67,9 +69,7 @@ export const launchProcess = async (
 				const exitReason = code === null ? `signal ${signal ?? "unknown"}` : `exit code ${code}`;
 				const output = stderr.trim() || stdout.trim();
 				rejectResult(
-					new Error(
-						`Command ${command} failed with ${exitReason}${output ? `:\n${output}` : ""}`
-					)
+					new Error(`Command ${command} failed with ${exitReason}${output ? `:\n${output}` : ""}`)
 				);
 				return;
 			}
@@ -79,7 +79,18 @@ export const launchProcess = async (
 	});
 };
 
+export const readBuiltSha = () =>
+	readFile(BUILT_SHA_PATH, "utf8").then(
+		(sha) => sha.trim(),
+		() => null
+	);
+export const writeBuiltSha = (sha: string) => writeFile(BUILT_SHA_PATH, `${sha}\n`);
+
 export const update = async () => {
-	await updateFromGit();
-	await updateFromNpm();
+	const pulled = await updateFromGit();
+	const head = await getHeadSha();
+	if (pulled || !existsSync(CLIENT_DIST_DIR) || (await readBuiltSha()) !== head) {
+		await updateFromNpm();
+		await writeBuiltSha(head);
+	}
 };
