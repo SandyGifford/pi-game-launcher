@@ -131,7 +131,7 @@ export default [
   },
 
   {
-    files: ["server/**/*.{js,ts}"],
+    files: ["server/**/*.{js,ts}", "startup/**/*.{js,ts}"],
     rules: { "no-console": "off" },
   },
 
