@@ -3,11 +3,10 @@ import {
 	EventDispatcherListenerError,
 	EventDispatcherMountError,
 	EventDispatcherUnmountError,
-	eventDispatcher,
-	eventDispatcherFamily,
-	type EventDispatcher,
-	type StatefulEventDispatcher,
-} from "./event-dispatcher";
+} from "./event-dispatcher.errors";
+import { eventDispatcher } from "./event-dispatcher";
+import { eventDispatcherFamily } from "./event-dispatcher-family";
+import type { EventDispatcher } from "./event-dispatcher.types";
 
 const catchError = (fn: () => unknown): unknown => {
 	try {
@@ -20,8 +19,8 @@ const catchError = (fn: () => unknown): unknown => {
 
 it("reuses keyed dispatchers and evicts them after the final listener unsubscribes", () => {
 	const family = eventDispatcherFamily(
-		(_value: { readonly id: number }) => eventDispatcher<number>(),
-		({ id }: { readonly id: number }) => id
+		(_value: { readonly id: number }) => eventDispatcher(0),
+		{ getKey: ({ id }: { readonly id: number }) => id }
 	);
 	const first = family({ id: 1 });
 	expect(family({ id: 1 })).toBe(first);
@@ -37,8 +36,8 @@ it("reuses keyed dispatchers and evicts them after the final listener unsubscrib
 });
 
 it("preserves the concrete stateful dispatcher type in the family", () => {
-	const family = eventDispatcherFamily<number, StatefulEventDispatcher<number>>((value) =>
-		eventDispatcher({ initialState: value })
+	const family = eventDispatcherFamily<number, EventDispatcher<number>>((value) =>
+		eventDispatcher(value)
 	);
 	const dispatcher = family(42);
 
@@ -46,9 +45,8 @@ it("preserves the concrete stateful dispatcher type in the family", () => {
 });
 
 it("does not let an old dispatcher evict its replacement", () => {
-	const family = eventDispatcherFamily<number, EventDispatcher<number>, number>(
-		() => eventDispatcher<number>(),
-		(value) => value
+	const family = eventDispatcherFamily<number, EventDispatcher<number>>(
+		() => eventDispatcher(0)
 	);
 	const first = family(1);
 	family.remove(1);
@@ -62,7 +60,7 @@ it("does not let an old dispatcher evict its replacement", () => {
 });
 
 it("supports explicit removal and clearing", () => {
-	const family = eventDispatcherFamily((value: number) => eventDispatcher<number>());
+	const family = eventDispatcherFamily((value: number) => eventDispatcher(value));
 	const first = family(1);
 	const second = family(2);
 
@@ -76,7 +74,7 @@ it("supports explicit removal and clearing", () => {
 });
 
 it("delivers to every listener even if one throws, then reports all errors", () => {
-	const dispatcher = eventDispatcher<number>();
+	const dispatcher = eventDispatcher(0);
 	const after = vi.fn();
 	const boom = new Error("boom");
 	const bang = new Error("bang");
@@ -96,7 +94,7 @@ it("delivers to every listener even if one throws, then reports all errors", () 
 });
 
 it("rolls back a subscription whose mount listener throws", () => {
-	const dispatcher = eventDispatcher<number>();
+	const dispatcher = eventDispatcher(0);
 	const cleanup = vi.fn();
 	const unmount = vi.fn();
 	const boom = new Error("boom");
@@ -118,7 +116,7 @@ it("rolls back a subscription whose mount listener throws", () => {
 });
 
 it("runs every cleanup and unmount listener when one throws", () => {
-	const dispatcher = eventDispatcher<number>();
+	const dispatcher = eventDispatcher(0);
 	const boom = new Error("boom");
 	const second = vi.fn();
 	const unmount = vi.fn();

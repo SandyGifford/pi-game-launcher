@@ -1,5 +1,5 @@
 import { expect, it, vi } from "vitest";
-import type { GamepadStick } from "./gamepad.utils";
+import type { GamepadState, GamepadStick } from "./gamepad.utils";
 
 const makeGamepad = (timestamp: number, axes: number[], buttons: GamepadButton[]): Gamepad =>
 	({
@@ -35,19 +35,11 @@ it("cascades gamepad values and stops polling after the last unsubscribe", async
 	vi.stubGlobal("cancelAnimationFrame", cancelFrame);
 
 	const gamepadUtils = await import("./gamepad.utils");
-	const anyAxis = gamepadUtils.getAnyControllerAxisDispatcher("LEFT_STICK_X", {
-		deadZone: 0.1,
-	});
-	const anyButton = gamepadUtils.getAnyControllerButtonDispatcher("FACE_BOTTOM");
-	const playerGamepad = gamepadUtils.playerGamepadDispatcher(1);
-	const direction = gamepadUtils.anyDirectionDispatcher();
-	const axisValues: number[] = [];
-	const buttonValues: boolean[] = [];
-	const playerValues: (Gamepad | undefined)[] = [];
+	const playerGamepad = gamepadUtils.gamepadByPlayerFamily(1);
+	const direction = gamepadUtils.allGamepadDirection;
+	const playerValues: (GamepadState | undefined)[] = [];
 	const directionValues: GamepadStick[] = [];
 	const unsubscribers = [
-		anyAxis.on("value", (value) => axisValues.push(value)),
-		anyButton.on("value", (value) => buttonValues.push(value.pressed)),
 		playerGamepad.on("value", (value) => playerValues.push(value)),
 		direction.on("value", (value) => directionValues.push(value)),
 	];
@@ -68,16 +60,16 @@ it("cascades gamepad values and stops polling after the last unsubscribe", async
 		value: 0,
 	}));
 	buttons[0] = { pressed: true, touched: true, value: 1 };
-	gamepads.push(makeGamepad(1, [0.05, 0, 0, 0], buttons));
+	gamepads.push(makeGamepad(1, [0.02, 0, 0, 0], buttons));
 	pollNextFrame();
 
-	expect(axisValues).toEqual([0]);
-	expect(buttonValues).toEqual([false, true]);
+	expect(playerValues.at(-1)?.axes).toEqual([0, 0, 0, 0]);
+	expect(playerValues.at(-1)?.buttons[0]?.pressed).toBe(true);
 	expect(playerValues.at(-1)?.index).toBe(0);
 
 	gamepads[0] = makeGamepad(2, [0.4, 0, 0, 0], buttons);
 	pollNextFrame();
-	expect(axisValues).toEqual([0, 0.4]);
+	expect(playerValues.at(-1)?.axes).toEqual([0.4, 0, 0, 0]);
 	expect(directionValues.at(-1)).toEqual({ x: 0.4, y: 0 });
 
 	unsubscribers.forEach((unsubscribe) => unsubscribe());
