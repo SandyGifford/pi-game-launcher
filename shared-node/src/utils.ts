@@ -33,7 +33,7 @@ export type ProcessResult = {
 	readonly code: number;
 };
 
-const spawnChild = (command: string, args: readonly string[], options?: SpawnOptions) =>
+export const spawnChild = (command: string, args: readonly string[], options?: SpawnOptions) =>
 	new Promise<ChildProcess>((resolveSpawn, rejectSpawn) => {
 		const child = spawn(command, args, { cwd: ROOT_DIR, ...options });
 

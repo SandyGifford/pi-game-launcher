@@ -1,6 +1,7 @@
-import { awaitTime, type Launchable, type LaunchableID, type LaunchAction } from "@repo/shared";
+import { type Launchable, type LaunchableID, type LaunchAction } from "@repo/shared";
 import { LAUNCHABLE_META, LAUNCHABLES_MAP } from "./consts.ts";
 import type { NewLaunchable } from "./types.ts";
+import { spawnChild } from "@repo/shared-node";
 
 let lastId = 1;
 export const processNewLaunchables = (
@@ -17,13 +18,11 @@ export const isLaunchableId = (id: unknown): id is LaunchableID => {
 };
 
 export const shutdown = async () => {
-	// await spawnChild("shutdown", ["-h", "now"]);
-	await awaitTime(1000);
+	await spawnChild("shutdown", ["-h", "now"]);
 	console.log("=>", "shutdown");
 };
 export const restart = async () => {
-	// await spawnChild("reboot", []);
-	await awaitTime(1000);
+	await spawnChild("reboot", []);
 	console.log("=>", "restart");
 };
 
