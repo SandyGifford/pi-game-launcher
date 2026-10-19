@@ -10,9 +10,11 @@
 }
 
 .icon {
-  flex: 1 1 0;
-  width: fit-content;
+  flex: 1 1 auto;
+  height: 0%;
   align-self: center;
+  max-width: 100%;
+  object-fit: contain;
 }
 
 .title {
