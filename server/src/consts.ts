@@ -6,13 +6,13 @@ import { processNewLaunchables } from "./utils.ts";
 import { getEnvironmentValue, launchProcessDetached, SHELL_SCRIPTS_DIR } from "@repo/shared-node";
 
 export const LAUNCHABLES: readonly Launchable[] = processNewLaunchables([
-	{
-		type: "APP",
-		title: "Steam",
-		iconPath: "steam.png",
-		appPath: "STEAM_APP_PATH",
-		launchArguments: ["-bigpicture"],
-	},
+	// {
+	// 	type: "APP",
+	// 	title: "Steam",
+	// 	iconPath: "steam.png",
+	// 	appPath: "STEAM_APP_PATH",
+	// 	launchArguments: ["-bigpicture"],
+	// },
 	{
 		type: "URL",
 		title: "GeForce NOW",
