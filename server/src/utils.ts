@@ -17,14 +17,8 @@ export const isLaunchableId = (id: unknown): id is LaunchableID => {
 	return id in LAUNCHABLES_MAP;
 };
 
-export const shutdown = async () => {
-	await spawnChild("shutdown", ["-h", "now"]);
-	console.log("=>", "shutdown");
-};
-export const restart = async () => {
-	await spawnChild("reboot", []);
-	console.log("=>", "restart");
-};
+export const shutdown = async () => await spawnChild("shutdown", ["-h", "now"]);
+export const restart = async () => await spawnChild("reboot", []);
 
 export const launch = async (launchable: Launchable): Promise<LaunchAction> =>
 	(await LAUNCHABLE_META[launchable.type].launch(launchable as never)) || { action: "none" };
