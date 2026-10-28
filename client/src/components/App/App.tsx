@@ -10,6 +10,7 @@ import type { SetView, ViewName, ViewParameters } from "../../types/view.types";
 import { renderView } from "../../utils/view.utils";
 import { View } from "../View/View";
 import classes from "./App.module.scss";
+import { getWifiList } from "../../api";
 
 export type AppProps = {
 	readonly className?: string;
@@ -27,6 +28,10 @@ export const App: FC<AppProps> = memo(({ className }) => {
 	const [viewState, setViewState] = useState<ViewState>(DEFAULT_VIEW);
 
 	const setView = useCallbackStable<SetView>((view, ...args) => setViewState({ view, args }));
+
+	useEffect(() => {
+		(async () => console.log("=>", await getWifiList()))();
+	}, []);
 
 	useEffect(() => {
 		// animate briefly on mount

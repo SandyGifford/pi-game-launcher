@@ -58,3 +58,22 @@ export type PromisifyProps<
 > = Omit<P, K> & {
 	readonly [KEY in K]?: PromisifyHandler<Extract<NonNullable<P[KEY]>, Fn>>;
 };
+
+// Wifi
+
+export type BSSID = Tagged<
+	`${string}${string}:${string}${string}:${string}${string}:${string}${string}:${string}${string}:${string}${string}`,
+	"BSSID"
+>;
+export type SSID = Tagged<string, "SSID">;
+export type WifiSecurity = Tagged<string, "WifiSecurity">;
+
+export type WifiAccessPoint = {
+	readonly ssid: SSID;
+	readonly inUse: boolean;
+	readonly bssid: BSSID;
+	readonly hidden: boolean;
+	readonly signal: number;
+	readonly security: readonly WifiSecurity[];
+	readonly matchingSsids: readonly WifiAccessPoint[];
+};
