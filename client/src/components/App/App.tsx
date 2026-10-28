@@ -45,6 +45,6 @@ export const App: FC<AppProps> = memo(({ className }) => {
           </View>
         </TransitionGroup>
       </div>
-    </AppContext >
+    </AppContext>
   );
 });
