@@ -2,11 +2,11 @@ import clsx from "clsx";
 import type { FC } from "react";
 import { memo, useRef } from "react";
 import { CSSTransition } from "react-transition-group";
-import { HomepageButton, type HomepageButtonProps } from "../HomepageButton/HomepageButton";
+import { GroupThinkButton, type GroupThinkButton } from "../GroupThinkButton/GroupThinkButton";
 import classes from "./OtherButton.module.scss";
 
 export type OtherButtonProps = Pick<
-	HomepageButtonProps,
+	GroupThinkButton,
 	"thinkingId" | "currentThinkingId" | "setCurrentThinkingId" | "onClick" | "children"
 > & {
 	readonly className?: string;
@@ -39,7 +39,7 @@ export const OtherButton: FC<OtherButtonProps> = memo(
 				{...rest}
 			>
 				<div className={clsx("OtherButton", className, classes.root)} ref={ref}>
-					<HomepageButton
+					<GroupThinkButton
 						className={classes.button}
 						thinkingId={thinkingId}
 						currentThinkingId={currentThinkingId}
@@ -47,7 +47,7 @@ export const OtherButton: FC<OtherButtonProps> = memo(
 						onClick={onClick}
 					>
 						{children}
-					</HomepageButton>
+					</GroupThinkButton>
 				</div>
 			</CSSTransition>
 		);

@@ -3,23 +3,23 @@ import { forwardRef, memo, type MouseEventHandler } from "react";
 import type { OverrideProperties } from "type-fest";
 import { useCallbackStable } from "../../hooks/useCallbackStable.hook";
 import { AsyncButton, type AsyncButtonProps } from "../AsyncButton/AsyncButton";
-import classes from "./HomepageButton.module.scss";
+import classes from "./GroupThinkButton.module.scss";
 
-export type HomepageButtonThinkingID = string;
+export type GroupThinkButtonThinkingID = string;
 
-export type HomepageButtonProps = OverrideProperties<
+export type GroupThinkButton = OverrideProperties<
 	AsyncButtonProps,
 	{
 		readonly hidden?: boolean;
 	}
 > & {
-	readonly thinkingId?: HomepageButtonThinkingID;
-	readonly setCurrentThinkingId: (id: HomepageButtonThinkingID) => unknown;
-	readonly currentThinkingId: HomepageButtonThinkingID | undefined;
+	readonly thinkingId?: GroupThinkButtonThinkingID;
+	readonly setCurrentThinkingId: (id: GroupThinkButtonThinkingID) => unknown;
+	readonly currentThinkingId: GroupThinkButtonThinkingID | undefined;
 };
 
-export const HomepageButton = memo(
-	forwardRef<HTMLButtonElement, HomepageButtonProps>(
+export const GroupThinkButton = memo(
+	forwardRef<HTMLButtonElement, GroupThinkButton>(
 		(
 			{
 				className,
@@ -41,7 +41,7 @@ export const HomepageButton = memo(
 
 			return (
 				<AsyncButton
-					className={clsx("HomepageButton", className, classes.root)}
+					className={clsx("GroupThinkButton", className, classes.root)}
 					ref={ref}
 					onClick={handleClick}
 					disabled={currentThinkingId !== undefined}
