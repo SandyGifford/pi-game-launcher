@@ -10,41 +10,54 @@ import type { SetView, ViewName, ViewParameters } from "../../types/view.types";
 import { renderView } from "../../utils/view.utils";
 import { View } from "../View/View";
 import classes from "./App.module.scss";
+import { useWindowHandler } from "../../hooks/useWindowHandler.hook";
+import { GroupThinkProvider } from "../GroupThinkButton/GroupThinkButton";
 
 export type AppProps = {
-  readonly className?: string;
+	readonly className?: string;
 };
 
 type ViewState<VIEW extends ViewName = ViewName> = {
-  readonly view: VIEW;
-  readonly args: ViewParameters<VIEW>;
+	readonly view: VIEW;
+	readonly args: ViewParameters<VIEW>;
 };
 
 const DEFAULT_VIEW: ViewState<"HOME"> = { view: "HOME", args: [] };
 
 export const App: FC<AppProps> = memo(({ className }) => {
-  const { inUse: thinking, reserveWhile: thinkWhile } = useInUse();
-  const [viewState, setViewState] = useState<ViewState>(DEFAULT_VIEW);
+	const { inUse: thinking, reserveWhile: thinkWhile } = useInUse();
+	const [viewState, setViewState] = useState<ViewState>(DEFAULT_VIEW);
 
-  const setView = useCallbackStable<SetView>((view, ...args) => setViewState({ view, args }));
+	const setView = useCallbackStable<SetView>((view, ...args) => setViewState({ view, args }));
 
-  useEffect(() => {
-    // animate briefly on mount
-    thinkWhile(() => awaitTime(1000));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+	const [groupThinkId, setGroupThinkId] = useState<string>();
+	useWindowHandler(() => setGroupThinkId(undefined), [], "focus");
 
-  return (
-    <AppContext thinkWhile={thinkWhile} setView={setView}>
-      <div className={clsx("App", className, classes.root, thinking && classes["root--thinking"])}>
-        <TransitionGroup>
-          <View key={viewState.view}>
-            {(transitionStatus) =>
-              renderView(viewState.view, { transitionStatus }, ...viewState.args)
-            }
-          </View>
-        </TransitionGroup>
-      </div>
-    </AppContext>
-  );
+	useEffect(() => {
+		setGroupThinkId(undefined);
+	}, [viewState.view]);
+
+	useEffect(() => {
+		// animate briefly on mount
+		thinkWhile(() => awaitTime(1000));
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
+
+	return (
+		<AppContext thinkWhile={thinkWhile} setView={setView}>
+			<GroupThinkProvider currentThinkingId={groupThinkId} setCurrentThinkingId={setGroupThinkId}>
+				<div
+					className={clsx("App", className, classes.root, thinking && classes["root--thinking"])}
+				>
+					<TransitionGroup>
+						<View key={viewState.view}>
+							{(transitionStatus) =>
+								renderView(viewState.view, { transitionStatus }, ...viewState.args)
+							}
+						</View>
+					</TransitionGroup>
+				</div>
+			</GroupThinkProvider>
+		</AppContext>
+	);
 });
