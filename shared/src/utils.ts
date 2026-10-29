@@ -1,3 +1,4 @@
+import type { IsUnion } from "type-fest";
 import { PRIMITIVE_META } from "./consts.ts";
 import type { PrimitiveType, PrimitiveTypeMap } from "./types.ts";
 
@@ -15,3 +16,17 @@ export const toError = (error: unknown): Error => {
 };
 
 export const awaitTime = (ms: number) => new Promise((res) => setTimeout(res, ms));
+
+export const mapToObject = <T, K extends string | number | symbol, V>(
+	arr: readonly T[],
+	fn: (item: T) => [key: K, value: V] | undefined
+): IsUnion<K> extends true ? { readonly [KEY in K]?: V } : { readonly [KEY in K]: V } =>
+	arr.reduce(
+		(obj, item) => {
+			const kvp = fn(item);
+			if (!kvp) return obj;
+			const [key, value] = kvp;
+			return { ...obj, [key]: value };
+		},
+		{} as { readonly [KEY in K]: V }
+	);

@@ -61,3 +61,5 @@ export const App: FC<AppProps> = memo(({ className }) => {
 		</AppContext>
 	);
 });
+
+App.displayName = "App";

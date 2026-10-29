@@ -1,16 +1,8 @@
 import clsx from "clsx";
-import {
-	createContext,
-	forwardRef,
-	memo,
-	useContext,
-	useMemo,
-	type FC,
-	type MouseEventHandler,
-	type ReactNode,
-} from "react";
+import { forwardRef, memo, useContext, type MouseEventHandler } from "react";
 import type { OverrideProperties } from "type-fest";
 import { useCallbackStable } from "../../hooks/useCallbackStable.hook";
+import { createQuickCtx } from "../../utils/createQuickCtx.utils";
 import { AsyncButton, type AsyncButtonProps } from "../AsyncButton/AsyncButton";
 import classes from "./GroupThinkButton.module.scss";
 
@@ -30,28 +22,12 @@ export type GroupThinkCtx = {
 	readonly setCurrentThinkingId: (id: GroupThinkButtonThinkingID) => void;
 };
 
-const ctx = createContext<GroupThinkCtx>({
+const [ctx, GroupThinkProvider] = createQuickCtx<GroupThinkCtx>("GroupThink", {
 	currentThinkingId: undefined,
 	setCurrentThinkingId: () => void 0,
-});
+})(["currentThinkingId", "setCurrentThinkingId"]);
 
-export const GroupThinkProvider: FC<GroupThinkCtx & { readonly children: ReactNode }> = ({
-	children,
-	currentThinkingId,
-	setCurrentThinkingId,
-}) => (
-	<ctx.Provider
-		value={useMemo(
-			() => ({
-				currentThinkingId,
-				setCurrentThinkingId,
-			}),
-			[currentThinkingId, setCurrentThinkingId]
-		)}
-	>
-		{children}
-	</ctx.Provider>
-);
+export { GroupThinkProvider };
 
 export const GroupThinkButton = memo(
 	forwardRef<HTMLButtonElement, GroupThinkButton>(
@@ -78,3 +54,5 @@ export const GroupThinkButton = memo(
 		}
 	)
 );
+
+GroupThinkButton.displayName = "GroupThinkButton";
