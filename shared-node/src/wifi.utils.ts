@@ -1,22 +1,6 @@
 import type { BSSID, SSID, WifiAccessPoint, WifiSecurity } from "@repo/shared";
 import { launchProcess } from "./utils.ts";
 
-(async () => {
-	console.log(
-		"===>",
-		(
-			await launchProcess("nmcli", [
-				"-t",
-				"-f",
-				"IN-USE,BSSID,SSID,SIGNAL,SECURITY",
-				"dev",
-				"wifi",
-				"list",
-			])
-		).stdout
-	);
-})();
-
 export const isSSID = (val: unknown): val is SSID => typeof val === "string";
 export const isWifiSecurity = (val: unknown): val is WifiSecurity => typeof val === "string";
 export const isBSSID = (val: unknown): val is BSSID =>
@@ -52,21 +36,28 @@ export const getWifiList = async (): Promise<readonly WifiAccessPoint[]> => {
 	).stdout
 		.split("\n")
 		.forEach((line) => {
+			console.log("=>", 0);
 			const [inUseStr = "", bssidStr, ssid, signalStr = "0", securityStr] = line
 				.split(/(?<!\\):/)
 				.map((s) => s.trim());
 
+			console.log("=>", 1);
 			const security = (securityStr ? securityStr.split(" ") : []).filter((sec) =>
 				isWifiSecurity(sec)
 			);
+			console.log("=>", 2);
 			const bssid = bssidStr?.replace(/\\:/g, ":");
 
+			console.log("=>", 3);
 			if (!isSSID(ssid)) return;
+			console.log("=>", 4);
 			if (!isBSSID(bssid)) return;
+			console.log("=>", 5);
 			// if the raw string indicated SOME sort of security, but we couldn't
 			// find a valid value in there, consider the AP invalid:  we're
 			// reporting a network without giving consumers enough data to connect
 			if (!!securityStr?.length && !security.length) return;
+			console.log("=>", 6);
 
 			const hidden = ssid === "";
 			const signal = capSignal(signalStr);
@@ -84,9 +75,14 @@ export const getWifiList = async (): Promise<readonly WifiAccessPoint[]> => {
 
 			const key = hidden ? {} : ssid;
 			const existing = collected.get(key);
+			console.log("=>", 7);
 			if (existing) {
+				console.log("=>", 8);
 				collected.set(key, { ...existing, matchingSsids: [...existing.matchingSsids, ap] });
-			} else collected.set(key, ap);
+			} else {
+				console.log("=>", 9);
+				collected.set(key, ap);
+			}
 		});
 
 	return [...collected.values()];
