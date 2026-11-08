@@ -44,6 +44,8 @@ export const getWifiList = async (): Promise<readonly WifiAccessPoint[]> => {
 				isWifiSecurity(sec)
 			);
 
+			console.log("=>", inUseStr, bssidStr, ssid, signalStr, securityStr);
+
 			const bssid = bssidStr?.replace(/\\:/g, ":");
 
 			if (!isSSID(ssid)) {
