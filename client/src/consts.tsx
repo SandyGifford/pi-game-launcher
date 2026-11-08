@@ -1,9 +1,9 @@
 import type { LaunchAction, LaunchActionType } from "@repo/shared";
 import type { ReactNode } from "react";
 import { Homepage } from "./components/Homepage/Homepage";
-import { WebView } from "./components/WebView/WebView";
-import type { ViewBaseParams, ViewName, ViewParameters } from "./types/view.types";
 import { Settings } from "./components/Settings/Settings";
+import { WebView } from "./components/WebView/WebView";
+import type { ViewBaseParams } from "./types/view.types";
 
 export const LAUNCH_ACTION_META: {
 	readonly [ACTION in LaunchActionType]: {
@@ -17,17 +17,7 @@ export const LAUNCH_ACTION_META: {
 export const VIEW_RENDERERS = {
 	HOME: () => <Homepage />,
 	SETTINGS: () => <Settings />,
-	WEB: (props, url: string) => <WebView url={url} />,
+	WEB: (props, url: string) => <WebView url={url} key={`web--${url}`} />,
 } satisfies {
 	readonly [NAME in string]: (props: ViewBaseParams, ...args: never[]) => ReactNode;
-};
-
-export const VIEW_META: {
-	readonly [VIEW in ViewName]: { readonly getKey?: (...args: ViewParameters<VIEW>) => string };
-} = {
-	HOME: {},
-	SETTINGS: {},
-	WEB: {
-		getKey: (url) => `web--${url}`,
-	},
 };
