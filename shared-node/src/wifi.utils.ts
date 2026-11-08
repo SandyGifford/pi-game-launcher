@@ -1,6 +1,22 @@
 import type { BSSID, SSID, WifiAccessPoint, WifiSecurity } from "@repo/shared";
 import { launchProcess } from "./utils.ts";
 
+(async () => {
+	console.log(
+		"===>",
+		(
+			await launchProcess("nmcli", [
+				"-t",
+				"-f",
+				"IN-USE,BSSID,SSID,SIGNAL,SECURITY",
+				"dev",
+				"wifi",
+				"list",
+			])
+		).stdout
+	);
+})();
+
 export const isSSID = (val: unknown): val is SSID => typeof val === "string";
 export const isWifiSecurity = (val: unknown): val is WifiSecurity => typeof val === "string";
 export const isBSSID = (val: unknown): val is BSSID =>
