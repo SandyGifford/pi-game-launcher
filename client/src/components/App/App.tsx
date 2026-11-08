@@ -12,6 +12,7 @@ import { View } from "../View/View";
 import classes from "./App.module.scss";
 import { useWindowHandler } from "../../hooks/useWindowHandler.hook";
 import { GroupThinkProvider } from "../GroupThinkButton/GroupThinkButton";
+import { getWifiList } from "../../api";
 
 export type AppProps = {
 	readonly className?: string;
@@ -36,6 +37,10 @@ export const App: FC<AppProps> = memo(({ className }) => {
 	useEffect(() => {
 		setGroupThinkId(undefined);
 	}, [viewState.view]);
+
+	useEffect(() => {
+		getWifiList().then((r) => console.log(r));
+	}, []);
 
 	useEffect(() => {
 		// animate briefly on mount
