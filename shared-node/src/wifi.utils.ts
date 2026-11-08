@@ -44,18 +44,10 @@ export const getWifiList = async (): Promise<readonly WifiAccessPoint[]> => {
 				isWifiSecurity(sec)
 			);
 
-			console.log("=>", inUseStr, bssidStr, ssid, signalStr, securityStr);
-
 			const bssid = bssidStr?.replace(/\\:/g, ":");
 
-			if (!isSSID(ssid)) {
-				console.log("=>", "no ssid", ssid);
-				return;
-			}
-			if (!isBSSID(bssid)) {
-				console.log("=>", "no bssid", bssid);
-				return;
-			}
+			if (!isSSID(ssid)) return;
+			if (!isBSSID(bssid)) return;
 
 			// if the raw string indicated SOME sort of security, but we couldn't
 			// find a valid value in there, consider the AP invalid:  we're
