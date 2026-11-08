@@ -192,7 +192,7 @@ export const Homepage: FC<HomepageProps> = memo(({ className }) => {
 					<OtherButton key="restart" thinkingId="RESTART" onClick={restart}>
 						restart
 					</OtherButton>
-					<OtherButton key="test" onClick={() => setView("WEB", "https://reddit.com")}>
+					<OtherButton key="test" onClick={() => setView("WEB", "https://play.geforcenow.com/mall/#/loginwall")}>
 						test
 					</OtherButton>
 				</div>
