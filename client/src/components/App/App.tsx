@@ -25,6 +25,7 @@ const DEFAULT_VIEW: ViewState<"HOME"> = { view: "HOME", args: [] };
 export const App: FC<AppProps> = memo(({ className }) => {
 	const { inUse: thinking, reserveWhile: thinkWhile } = useInUse();
 	const [viewState, setViewState] = useState<ViewState>(DEFAULT_VIEW);
+	const isMainView = viewState.view === DEFAULT_VIEW.view;
 
 	const setView = useCallbackStable<SetView>((view, ...args) => setViewState({ view, args }));
 
@@ -44,6 +45,12 @@ export const App: FC<AppProps> = memo(({ className }) => {
 						}
 					</View>
 				</TransitionGroup>
+				<button
+					className={clsx(classes.back, !isMainView && classes["back--show"])}
+					onClick={() => setViewState(DEFAULT_VIEW)}
+				>
+					→
+				</button>
 			</div>
 		</AppContext>
 	);
