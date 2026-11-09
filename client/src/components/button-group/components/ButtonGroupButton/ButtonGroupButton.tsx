@@ -3,25 +3,25 @@ import { forwardRef, memo, useEffect, useRef, type MouseEventHandler } from "rea
 import type { OverrideProperties } from "type-fest";
 import { useCallbackStable } from "../../../../hooks/useCallbackStable.hook";
 import { AsyncButton, type AsyncButtonProps } from "../../../AsyncButton/AsyncButton";
-import { useGroupThink, useGroupThinkRow } from "../../group-think.ctx";
-import classes from "./GroupThinkButton.module.scss";
+import { useButtonGroup, useButtonGroupRow } from "../../button-group.ctx";
+import classes from "./ButtonGroupButton.module.scss";
 
-export type GroupThinkButtonThinkingID = string;
+export type ButtonGroupButtonThinkingID = string;
 
-export type GroupThinkButtonProps = OverrideProperties<
+export type ButtonGroupButtonProps = OverrideProperties<
 	AsyncButtonProps,
 	{
 		readonly hidden?: boolean;
 	}
 > & {
-	readonly thinkingId?: GroupThinkButtonThinkingID;
+	readonly thinkingId?: ButtonGroupButtonThinkingID;
 };
 
-export const GroupThinkButton = memo(
-	forwardRef<HTMLButtonElement, GroupThinkButtonProps>(
+export const ButtonGroupButton = memo(
+	forwardRef<HTMLButtonElement, ButtonGroupButtonProps>(
 		({ className, hidden, children, onClick, thinkingId, ...rest }, ref) => {
-			const { currentThinkingId, setCurrentThinkingId } = useGroupThink();
-			const { addRef, removeRef } = useGroupThinkRow();
+			const { currentThinkingId, setCurrentThinkingId } = useButtonGroup();
+			const { addRef, removeRef } = useButtonGroupRow();
 			const internalRef = useRef<HTMLButtonElement>(null);
 
 			const hasID = thinkingId !== undefined;
@@ -37,7 +37,7 @@ export const GroupThinkButton = memo(
 
 			return (
 				<AsyncButton
-					className={clsx("GroupThinkButton", className, classes.root)}
+					className={clsx("ButtonGroupButton", className, classes.root)}
 					ref={(el) => {
 						internalRef.current = el;
 						if (!ref) return;
@@ -62,4 +62,4 @@ export const GroupThinkButton = memo(
 	)
 );
 
-GroupThinkButton.displayName = "GroupThinkButton";
+ButtonGroupButton.displayName = "ButtonGroupButton";

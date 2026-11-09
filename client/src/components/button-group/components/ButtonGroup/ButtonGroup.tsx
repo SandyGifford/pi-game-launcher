@@ -1,8 +1,8 @@
 import type { FC, ReactNode, RefObject } from "react";
 import { memo, useEffect, useMemo, useRef, useState } from "react";
-import classes from "./GroupThink.module.scss";
+import classes from "./ButtonGroup.module.scss";
 import clsx from "clsx";
-import { GroupThinkProvider } from "../../group-think.ctx";
+import { ButtonGroupProvider } from "../../button-group.ctx";
 import { useCallbackStable } from "../../../../hooks/useCallbackStable.hook";
 import { useWindowHandler } from "../../../../hooks/useWindowHandler.hook";
 import { clamp } from "../../../../utils/numbers.utils";
@@ -39,13 +39,13 @@ const findClosestElementIndex = (position: number, els: readonly HTMLElement[]):
 	return beforeDist < afterDist ? beforeIndex : afterIndex;
 };
 
-export type GroupThinkProps = {
+export type ButtonGroupProps = {
 	readonly className?: string;
 	readonly ready?: boolean;
 	readonly children?: ReactNode;
 };
 
-export const GroupThink: FC<GroupThinkProps> = memo(({ className, ready = true, children }) => {
+export const ButtonGroup: FC<ButtonGroupProps> = memo(({ className, ready = true, children }) => {
 	const rootRef = useRef<HTMLDivElement>(null);
 	const buttonRefs = useMemo(() => new Set<ReadonlySet<RefObject<HTMLButtonElement | null>>>(), []);
 	const addRefs = useCallbackStable((refs: ReadonlySet<RefObject<HTMLButtonElement | null>>) =>
@@ -147,7 +147,7 @@ export const GroupThink: FC<GroupThinkProps> = memo(({ className, ready = true, 
 	);
 
 	return (
-		<GroupThinkProvider
+		<ButtonGroupProvider
 			rootRef={rootRef}
 			ready={ready}
 			addRefs={addRefs}
@@ -156,11 +156,11 @@ export const GroupThink: FC<GroupThinkProps> = memo(({ className, ready = true, 
 			setCurrentThinkingId={setCurrentThinkingId}
 		>
 			<div
-				className={clsx("GroupThink", ready && "GroupThink--ready", className, classes.root)}
+				className={clsx("ButtonGroup", ready && "ButtonGroup--ready", className, classes.root)}
 				ref={rootRef}
 			>
 				{children}
 			</div>
-		</GroupThinkProvider>
+		</ButtonGroupProvider>
 	);
 });

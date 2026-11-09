@@ -5,18 +5,18 @@ import { memo } from "react";
 import { launch } from "../../api";
 import classes from "./LaunchableButton.module.scss";
 import {
-	GroupThinkButton,
-	type GroupThinkButtonProps,
-} from "../group-think/components/GroupThinkButton/GroupThinkButton";
+	ButtonGroupButton,
+	type ButtonGroupButtonProps,
+} from "../button-group/components/ButtonGroupButton/ButtonGroupButton";
 
 export type LaunchableButtonProps = {
 	readonly launchable: Launchable;
-} & Omit<GroupThinkButtonProps, "thinkingId" | "children">;
+} & Omit<ButtonGroupButtonProps, "thinkingId" | "children">;
 
 export const LaunchableButton: FC<LaunchableButtonProps> = memo(
 	({ className, launchable: { id, iconPath, title }, onClick, ...rest }) => {
 		return (
-			<GroupThinkButton
+			<ButtonGroupButton
 				className={clsx("LaunchableButton", className, classes.root)}
 				onClick={async (e) => {
 					await launch(id);
@@ -27,7 +27,7 @@ export const LaunchableButton: FC<LaunchableButtonProps> = memo(
 			>
 				<img className={classes.icon} src={`/icons/${iconPath}`} />
 				<span className={classes.title}>{title}</span>
-			</GroupThinkButton>
+			</ButtonGroupButton>
 		);
 	}
 );

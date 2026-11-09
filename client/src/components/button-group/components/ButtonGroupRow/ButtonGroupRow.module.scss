@@ -9,7 +9,7 @@
 	transform: scale(2);
 	transition: fn.transition(opacity, transform);
 
-	:global(.GroupThink--ready) & {
+	:global(.ButtonGroup--ready) & {
 		opacity: 1;
 		transform: none;
 	}
@@ -21,14 +21,14 @@
 	}
 
 	&.root--gap-narrow {
-		--GroupThink-row-item-padding: #{fn.spacing(1)};
+		--ButtonGroup-row-item-padding: #{fn.spacing(1)};
 	}
 
 	&.root--gap-normal {
-		--GroupThink-row-item-padding: #{fn.spacing(2)};
+		--ButtonGroup-row-item-padding: #{fn.spacing(2)};
 	}
 
 	&.root--gap-wide {
-		--GroupThink-row-item-padding: #{fn.spacing(3)};
+		--ButtonGroup-row-item-padding: #{fn.spacing(3)};
 	}
 }

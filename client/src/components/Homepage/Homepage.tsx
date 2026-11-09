@@ -5,10 +5,10 @@ import { memo } from "react";
 import { getLaunchables, needsUpdate, restart, shutdown, updateAndReload } from "../../api";
 import { useAppContext } from "../../contexts/AppContext.ctx";
 import { usePromise } from "../../hooks/usePromise.hook";
-import { GroupThink } from "../group-think/components/GroupThink/GroupThink";
-import { GroupThinkRow } from "../group-think/components/GroupThinkRow/GroupThinkRow";
+import { ButtonGroup } from "../button-group/components/ButtonGroup/ButtonGroup";
+import { ButtonGroupRow } from "../button-group/components/ButtonGroupRow/ButtonGroupRow";
 import { LaunchableButton } from "../LaunchableButton/LaunchableButton";
-import { GroupThinkButton } from "../group-think/components/GroupThinkButton/GroupThinkButton";
+import { ButtonGroupButton } from "../button-group/components/ButtonGroupButton/ButtonGroupButton";
 import { useViewReadyOnMount } from "../View/View.ctx";
 import classes from "./Homepage.module.scss";
 
@@ -35,8 +35,8 @@ export const Homepage: FC<HomepageProps> = memo(({ className }) => {
 	const isReady = status === "data";
 
 	return (
-		<GroupThink className={clsx("Homepage", className, classes.root)} ready={isReady}>
-			<GroupThinkRow gap="wide">
+		<ButtonGroup className={clsx("Homepage", className, classes.root)} ready={isReady}>
+			<ButtonGroupRow gap="wide">
 				{(() => {
 					switch (status) {
 						case "data":
@@ -51,10 +51,10 @@ export const Homepage: FC<HomepageProps> = memo(({ className }) => {
 							return;
 					}
 				})()}
-			</GroupThinkRow>
-			<GroupThinkRow className={classes.others}>
+			</ButtonGroupRow>
+			<ButtonGroupRow className={classes.others}>
 				{updateAvailable && (
-					<GroupThinkButton
+					<ButtonGroupButton
 						key="update-available"
 						thinkingId="UPDATE_AVAILABLE"
 						onClick={async () => {
@@ -62,19 +62,19 @@ export const Homepage: FC<HomepageProps> = memo(({ className }) => {
 						}}
 					>
 						update available!
-					</GroupThinkButton>
+					</ButtonGroupButton>
 				)}
-				<GroupThinkButton key="configure" onClick={() => setView("SETTINGS")}>
+				<ButtonGroupButton key="configure" onClick={() => setView("SETTINGS")}>
 					configure
-				</GroupThinkButton>
-				<GroupThinkButton key="shutdown" thinkingId="SHUTDOWN" onClick={shutdown}>
+				</ButtonGroupButton>
+				<ButtonGroupButton key="shutdown" thinkingId="SHUTDOWN" onClick={shutdown}>
 					shutdown
-				</GroupThinkButton>
-				<GroupThinkButton key="restart" thinkingId="RESTART" onClick={restart}>
+				</ButtonGroupButton>
+				<ButtonGroupButton key="restart" thinkingId="RESTART" onClick={restart}>
 					restart
-				</GroupThinkButton>
-			</GroupThinkRow>
-		</GroupThink>
+				</ButtonGroupButton>
+			</ButtonGroupRow>
+		</ButtonGroup>
 	);
 });
 

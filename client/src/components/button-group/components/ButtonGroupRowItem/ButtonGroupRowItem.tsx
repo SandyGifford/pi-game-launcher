@@ -3,13 +3,13 @@ import type { FC, ReactNode } from "react";
 import { useRef } from "react";
 import { CSSTransition } from "react-transition-group";
 import type { InjectableTransitionProps } from "../../../TransitionInjector/TransitionInjector";
-import classes from "./GroupThinkRowItem.module.scss";
+import classes from "./ButtonGroupRowItem.module.scss";
 
-export type GroupThinkRowItemProps = InjectableTransitionProps & {
+export type ButtonGroupRowItemProps = InjectableTransitionProps & {
 	readonly children?: ReactNode;
 };
 
-export const GroupThinkRowItem: FC<GroupThinkRowItemProps> = ({ children, ...transitionProps }) => {
+export const ButtonGroupRowItem: FC<ButtonGroupRowItemProps> = ({ children, ...transitionProps }) => {
 	const ref = useRef<HTMLDivElement>(null);
 
 	return (
@@ -27,7 +27,7 @@ export const GroupThinkRowItem: FC<GroupThinkRowItemProps> = ({ children, ...tra
 			{...transitionProps}
 		>
 			<div
-				className={clsx("GroupThinkRowItem", classes.root)}
+				className={clsx("ButtonGroupRowItem", classes.root)}
 				ref={ref}
 				inert={transitionProps.in === false}
 			>

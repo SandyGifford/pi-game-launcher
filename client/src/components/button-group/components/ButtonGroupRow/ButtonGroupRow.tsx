@@ -1,20 +1,20 @@
 import type { FC, HTMLAttributes, ReactElement, ReactNode, RefObject } from "react";
 import { cloneElement, memo, useEffect, useLayoutEffect, useMemo, useRef } from "react";
-import classes from "./GroupThinkRow.module.scss";
+import classes from "./ButtonGroupRow.module.scss";
 import clsx from "clsx";
 import { TransitionGroup } from "react-transition-group";
 import type { TransitionProps } from "react-transition-group/Transition";
-import { GroupThinkRowProvider, useGroupThink } from "../../group-think.ctx";
+import { ButtonGroupRowProvider, useButtonGroup } from "../../button-group.ctx";
 import { useCallbackStable } from "../../../../hooks/useCallbackStable.hook";
 import type { InjectableTransitionProps } from "../../../TransitionInjector/TransitionInjector";
-import { GroupThinkRowItem } from "../GroupThinkRowItem/GroupThinkRowItem";
+import { ButtonGroupRowItem } from "../ButtonGroupRowItem/ButtonGroupRowItem";
 
 // TransitionGroup injects its props into direct children only, so each child is wrapped in a
-// GroupThinkRowItem that receives them. They're stripped from the real child so they don't leak.
+// ButtonGroupRowItem that receives them. They're stripped from the real child so they don't leak.
 const wrapInRowItem = (child: ReactElement<InjectableTransitionProps>): ReactElement => {
 	const { in: inProp, onExited, appear, enter, exit } = child.props;
 	return (
-		<GroupThinkRowItem
+		<ButtonGroupRowItem
 			key={child.key}
 			in={inProp}
 			onExited={onExited}
@@ -29,7 +29,7 @@ const wrapInRowItem = (child: ReactElement<InjectableTransitionProps>): ReactEle
 				enter: undefined,
 				exit: undefined,
 			})}
-		</GroupThinkRowItem>
+		</ButtonGroupRowItem>
 	);
 };
 
@@ -38,18 +38,18 @@ const RowElement: FC<
 	HTMLAttributes<HTMLDivElement> & { readonly elRef: RefObject<HTMLDivElement | null> }
 > = ({ elRef, ...rest }) => <div ref={elRef} {...rest} />;
 
-export type GroupThinkRowProps = {
+export type ButtonGroupRowProps = {
 	readonly className?: string;
 	readonly gap?: "narrow" | "normal" | "wide";
 	readonly children?: ReactNode;
 };
 
-export const GroupThinkRow: FC<GroupThinkRowProps> = memo(
+export const ButtonGroupRow: FC<ButtonGroupRowProps> = memo(
 	({ className, gap = "normal", children }) => {
-		const { addRefs, removeRefs, rootRef, ready } = useGroupThink();
+		const { addRefs, removeRefs, rootRef, ready } = useButtonGroup();
 		const rowRef = useRef<HTMLDivElement>(null);
 
-		// Scale in from the centre of the GroupThink. Offsets are used because, unlike
+		// Scale in from the centre of the ButtonGroup. Offsets are used because, unlike
 		// bounding rects, they ignore the row's own (scaled) transform.
 		useLayoutEffect(() => {
 			const root = rootRef.current;
@@ -81,16 +81,16 @@ export const GroupThinkRow: FC<GroupThinkRowProps> = memo(
 		}, [addRefs, removeRefs, buttonRefs]);
 
 		return (
-			<GroupThinkRowProvider addRef={addRef} removeRef={removeRef}>
+			<ButtonGroupRowProvider addRef={addRef} removeRef={removeRef}>
 				<TransitionGroup
 					component={RowElement}
 					elRef={rowRef}
-					className={clsx("GroupThinkRow", className, classes.root, classes[`root--gap-${gap}`])}
+					className={clsx("ButtonGroupRow", className, classes.root, classes[`root--gap-${gap}`])}
 					childFactory={wrapInRowItem}
 				>
 					{children as ReactElement<TransitionProps<HTMLElement>>[]}
 				</TransitionGroup>
-			</GroupThinkRowProvider>
+			</ButtonGroupRowProvider>
 		);
 	}
 );
