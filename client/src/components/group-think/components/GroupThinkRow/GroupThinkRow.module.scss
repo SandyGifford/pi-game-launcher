@@ -1,2 +1,15 @@
+@use "../../../../fn.scss";
+
 .root {
+	&.root--gap-narrow {
+		--GroupThink-row-item-padding: #{fn.spacing(1)};
+	}
+
+	&.root--gap-normal {
+		--GroupThink-row-item-padding: #{fn.spacing(2)};
+	}
+
+	&.root--gap-wide {
+		--GroupThink-row-item-padding: #{fn.spacing(3)};
+	}
 }

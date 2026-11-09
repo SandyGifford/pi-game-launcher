@@ -68,7 +68,9 @@ export const GroupThink: FC<GroupThinkProps> = memo(({ className, children }) =>
 			readonly right?: boolean;
 		}) => {
 			const rows = [...buttonRefs].map((row) =>
-				[...row].map(({ current }) => current).filter((el) => !!el)
+				[...row]
+					.map(({ current }) => current)
+					.filter((el): el is HTMLButtonElement => !!el && !el.closest("[inert]"))
 			);
 			const focused = document.activeElement;
 

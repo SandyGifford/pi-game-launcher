@@ -1,6 +1,7 @@
 @use "../../../../fn.scss";
 
 .root {
+	width: max-content;
 	transition: fn.transition(transform, border-width);
 	&:focus {
 		outline: none;

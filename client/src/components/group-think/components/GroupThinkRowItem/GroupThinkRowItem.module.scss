@@ -1,29 +1,28 @@
-@use "../../fn.scss";
+@use "../../../../fn.scss";
 
 .root {
+	box-sizing: border-box;
 	display: grid;
 	grid-template-columns: minmax(0, 1fr);
-	opacity: 1;
-	transition: fn.transition(grid-template-columns, opacity, margin, transform);
 	justify-items: center;
-	margin: fn.spacing(0, 1);
+	padding: 0 var(--GroupThink-row-item-padding, #{fn.spacing(2)});
+	opacity: 1;
+	transition: fn.transition(grid-template-columns, padding, opacity, transform);
 
 	&.root--enter,
 	&.root--exit-active,
 	&.root--exit-done {
 		grid-template-columns: minmax(0, 0fr);
-		margin: 0;
+		padding-left: 0;
+		padding-right: 0;
 		opacity: 0;
 		transform: translateY(fn.spacing(3));
 	}
 
 	&.root--enter-active {
 		grid-template-columns: minmax(0, 1fr);
+		padding: 0 var(--GroupThink-row-item-padding, #{fn.spacing(2)});
 		opacity: 1;
 		transform: none;
 	}
-}
-
-.button {
-	width: max-content;
 }
