@@ -6,10 +6,8 @@ import { TransitionGroup } from "react-transition-group";
 import { AppContext } from "../../contexts/AppContext.ctx";
 import { useCallbackStable } from "../../hooks/useCallbackStable.hook";
 import { useInUse } from "../../hooks/useInUse.hook";
-import { useWindowHandler } from "../../hooks/useWindowHandler.hook";
 import type { SetView, ViewName, ViewParameters } from "../../types/view.types";
 import { renderView } from "../../utils/view.utils";
-import { GroupThinkProvider } from "../GroupThinkButton/GroupThinkButton";
 import { View } from "../View/View";
 import classes from "./App.module.scss";
 
@@ -30,13 +28,6 @@ export const App: FC<AppProps> = memo(({ className }) => {
 
 	const setView = useCallbackStable<SetView>((view, ...args) => setViewState({ view, args }));
 
-	const [groupThinkId, setGroupThinkId] = useState<string>();
-	useWindowHandler(() => setGroupThinkId(undefined), [], "focus");
-
-	useEffect(() => {
-		setGroupThinkId(undefined);
-	}, [viewState.view]);
-
 	useEffect(() => {
 		// animate briefly on mount
 		thinkWhile(() => awaitTime(1000));
@@ -45,19 +36,15 @@ export const App: FC<AppProps> = memo(({ className }) => {
 
 	return (
 		<AppContext thinkWhile={thinkWhile} setView={setView}>
-			<GroupThinkProvider currentThinkingId={groupThinkId} setCurrentThinkingId={setGroupThinkId}>
-				<div
-					className={clsx("App", className, classes.root, thinking && classes["root--thinking"])}
-				>
-					<TransitionGroup>
-						<View key={viewState.view}>
-							{(transitionStatus) =>
-								renderView(viewState.view, { transitionStatus }, ...viewState.args)
-							}
-						</View>
-					</TransitionGroup>
-				</div>
-			</GroupThinkProvider>
+			<div className={clsx("App", className, classes.root, thinking && classes["root--thinking"])}>
+				<TransitionGroup>
+					<View key={viewState.view}>
+						{(transitionStatus) =>
+							renderView(viewState.view, { transitionStatus }, ...viewState.args)
+						}
+					</View>
+				</TransitionGroup>
+			</div>
 		</AppContext>
 	);
 });

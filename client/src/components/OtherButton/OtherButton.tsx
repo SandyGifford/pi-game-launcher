@@ -2,10 +2,14 @@ import clsx from "clsx";
 import type { FC } from "react";
 import { memo, useRef } from "react";
 import { CSSTransition } from "react-transition-group";
-import { GroupThinkButton } from "../GroupThinkButton/GroupThinkButton";
 import classes from "./OtherButton.module.scss";
+import type { GroupThinkButtonProps } from "../group-think/components/GroupThinkButton/GroupThinkButton";
+import { GroupThinkButton } from "../group-think/components/GroupThinkButton/GroupThinkButton";
 
-export type OtherButtonProps = Pick<GroupThinkButton, "thinkingId" | "onClick" | "children"> & {
+export type OtherButtonProps = Pick<
+	GroupThinkButtonProps,
+	"thinkingId" | "onClick" | "children"
+> & {
 	readonly className?: string;
 };
 

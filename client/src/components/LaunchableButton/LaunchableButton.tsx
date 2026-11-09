@@ -3,12 +3,15 @@ import clsx from "clsx";
 import type { FC } from "react";
 import { memo } from "react";
 import { launch } from "../../api";
-import { GroupThinkButton } from "../GroupThinkButton/GroupThinkButton";
 import classes from "./LaunchableButton.module.scss";
+import {
+	GroupThinkButton,
+	type GroupThinkButtonProps,
+} from "../group-think/components/GroupThinkButton/GroupThinkButton";
 
 export type LaunchableButtonProps = {
 	readonly launchable: Launchable;
-} & Omit<GroupThinkButton, "thinkingId" | "children">;
+} & Omit<GroupThinkButtonProps, "thinkingId" | "children">;
 
 export const LaunchableButton: FC<LaunchableButtonProps> = memo(
 	({ className, launchable: { id, iconPath, title }, onClick, ...rest }) => {
