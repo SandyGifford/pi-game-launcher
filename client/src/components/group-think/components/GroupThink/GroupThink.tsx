@@ -84,7 +84,7 @@ export const GroupThink: FC<GroupThinkProps> = memo(({ className, children }) =>
 
 			if (focused instanceof HTMLButtonElement && rowIndex !== -1 && colIndex !== -1) {
 				const changeRow = (newRowIndex: number) => {
-					newRowIndex = clamp(newRowIndex, 0, (rows[rowIndex]?.length || 0) - 1);
+					newRowIndex = clamp(newRowIndex, 0, rows.length - 1);
 					const currentPosition = getElementCenter(focused);
 					rowIndex = newRowIndex;
 					const buttons = rows[rowIndex];
