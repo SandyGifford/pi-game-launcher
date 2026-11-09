@@ -3,6 +3,8 @@ import { createQuickCtx } from "../../utils/createQuickCtx.utils";
 import type { GroupThinkButtonThinkingID } from "./components/GroupThinkButton/GroupThinkButton";
 
 export type GroupThinkCtx = {
+	readonly rootRef: RefObject<HTMLElement | null>;
+	readonly ready: boolean;
 	readonly addRefs: (ref: ReadonlySet<RefObject<HTMLButtonElement | null>>) => void;
 	readonly removeRefs: (ref: ReadonlySet<RefObject<HTMLButtonElement | null>>) => void;
 	readonly currentThinkingId: GroupThinkButtonThinkingID | undefined;
@@ -10,11 +12,13 @@ export type GroupThinkCtx = {
 };
 
 export const [, GroupThinkProvider, useGroupThink] = createQuickCtx<GroupThinkCtx>("GroupThink", {
+	rootRef: { current: null },
+	ready: true,
 	currentThinkingId: undefined,
 	setCurrentThinkingId: () => void 0,
 	addRefs: () => void 0,
 	removeRefs: () => void 0,
-})(["currentThinkingId", "setCurrentThinkingId", "addRefs", "removeRefs"]);
+})(["rootRef", "ready", "currentThinkingId", "setCurrentThinkingId", "addRefs", "removeRefs"]);
 
 export type GroupThinkRowCtx = {
 	readonly addRef: (ref: RefObject<HTMLButtonElement | null>) => void;

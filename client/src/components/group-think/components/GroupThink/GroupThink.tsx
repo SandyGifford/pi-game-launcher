@@ -1,5 +1,5 @@
 import type { FC, ReactNode, RefObject } from "react";
-import { memo, useEffect, useMemo, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import classes from "./GroupThink.module.scss";
 import clsx from "clsx";
 import { GroupThinkProvider } from "../../group-think.ctx";
@@ -41,10 +41,12 @@ const findClosestElementIndex = (position: number, els: readonly HTMLElement[]):
 
 export type GroupThinkProps = {
 	readonly className?: string;
+	readonly ready?: boolean;
 	readonly children?: ReactNode;
 };
 
-export const GroupThink: FC<GroupThinkProps> = memo(({ className, children }) => {
+export const GroupThink: FC<GroupThinkProps> = memo(({ className, ready = true, children }) => {
+	const rootRef = useRef<HTMLDivElement>(null);
 	const buttonRefs = useMemo(() => new Set<ReadonlySet<RefObject<HTMLButtonElement | null>>>(), []);
 	const addRefs = useCallbackStable((refs: ReadonlySet<RefObject<HTMLButtonElement | null>>) =>
 		buttonRefs.add(refs)
@@ -146,12 +148,19 @@ export const GroupThink: FC<GroupThinkProps> = memo(({ className, children }) =>
 
 	return (
 		<GroupThinkProvider
+			rootRef={rootRef}
+			ready={ready}
 			addRefs={addRefs}
 			removeRefs={removeRefs}
 			currentThinkingId={currentThinkingId}
 			setCurrentThinkingId={setCurrentThinkingId}
 		>
-			<div className={clsx("GroupThink", className, classes.root)}>{children}</div>
+			<div
+				className={clsx("GroupThink", ready && "GroupThink--ready", className, classes.root)}
+				ref={rootRef}
+			>
+				{children}
+			</div>
 		</GroupThinkProvider>
 	);
 });

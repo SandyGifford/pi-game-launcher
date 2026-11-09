@@ -1,6 +1,25 @@
 @use "../../../../fn.scss";
 
 .root {
+	$max-staggered-rows: 8;
+	$stagger: 200ms;
+
+	display: flex;
+	opacity: 0;
+	transform: scale(2);
+	transition: fn.transition(opacity, transform);
+
+	:global(.GroupThink--ready) & {
+		opacity: 1;
+		transform: none;
+	}
+
+	@for $i from 2 through $max-staggered-rows {
+		&:nth-child(#{$i}) {
+			transition-delay: ($i - 1) * $stagger;
+		}
+	}
+
 	&.root--gap-narrow {
 		--GroupThink-row-item-padding: #{fn.spacing(1)};
 	}

@@ -35,10 +35,8 @@ export const Homepage: FC<HomepageProps> = memo(({ className }) => {
 	const isReady = status === "data";
 
 	return (
-		<GroupThink
-			className={clsx("Homepage", className, classes.root, isReady && classes["root--ready"])}
-		>
-			<GroupThinkRow className={classes.launchables} gap="wide">
+		<GroupThink className={clsx("Homepage", className, classes.root)} ready={isReady}>
+			<GroupThinkRow gap="wide">
 				{(() => {
 					switch (status) {
 						case "data":
