@@ -8,7 +8,7 @@ import { usePromise } from "../../hooks/usePromise.hook";
 import { GroupThink } from "../group-think/components/GroupThink/GroupThink";
 import { GroupThinkRow } from "../group-think/components/GroupThinkRow/GroupThinkRow";
 import { LaunchableButton } from "../LaunchableButton/LaunchableButton";
-import { OtherButton } from "../OtherButton/OtherButton";
+import { GroupThinkButton } from "../group-think/components/GroupThinkButton/GroupThinkButton";
 import { useViewReadyOnMount } from "../View/View.ctx";
 import classes from "./Homepage.module.scss";
 
@@ -56,7 +56,7 @@ export const Homepage: FC<HomepageProps> = memo(({ className }) => {
 			</GroupThinkRow>
 			<GroupThinkRow className={classes.others}>
 				{updateAvailable && (
-					<OtherButton
+					<GroupThinkButton
 						key="update-available"
 						thinkingId="UPDATE_AVAILABLE"
 						onClick={async () => {
@@ -64,17 +64,17 @@ export const Homepage: FC<HomepageProps> = memo(({ className }) => {
 						}}
 					>
 						update available!
-					</OtherButton>
+					</GroupThinkButton>
 				)}
-				<OtherButton key="configure" onClick={() => setView("SETTINGS")}>
+				<GroupThinkButton key="configure" onClick={() => setView("SETTINGS")}>
 					configure
-				</OtherButton>
-				<OtherButton key="shutdown" thinkingId="SHUTDOWN" onClick={shutdown}>
+				</GroupThinkButton>
+				<GroupThinkButton key="shutdown" thinkingId="SHUTDOWN" onClick={shutdown}>
 					shutdown
-				</OtherButton>
-				<OtherButton key="restart" thinkingId="RESTART" onClick={restart}>
+				</GroupThinkButton>
+				<GroupThinkButton key="restart" thinkingId="RESTART" onClick={restart}>
 					restart
-				</OtherButton>
+				</GroupThinkButton>
 			</GroupThinkRow>
 		</GroupThink>
 	);
