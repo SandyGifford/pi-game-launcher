@@ -1,12 +1,13 @@
-import type { FC, ReactNode, RefObject } from "react";
-import { memo, useEffect, useMemo, useRef, useState } from "react";
-import classes from "./ButtonGroup.module.scss";
 import clsx from "clsx";
-import { ButtonGroupProvider } from "../../button-group.ctx";
+import type { FC, ReactNode, RefObject } from "react";
+import { memo, useMemo, useRef, useState } from "react";
+import { useEventDispatcher } from "../../../../event-dispatcher/event-dispatcher.react";
 import { useCallbackStable } from "../../../../hooks/useCallbackStable.hook";
 import { useWindowHandler } from "../../../../hooks/useWindowHandler.hook";
+import { allGamepadDirection } from "../../../../utils/gamepad.utils";
 import { clamp } from "../../../../utils/numbers.utils";
-import { allGamepadDirection, type GamepadStick } from "../../../../utils/gamepad.utils";
+import { ButtonGroupProvider } from "../../button-group.ctx";
+import classes from "./ButtonGroup.module.scss";
 
 const STICK_THRESHOLD = 0.5;
 
@@ -111,19 +112,14 @@ export const ButtonGroup: FC<ButtonGroupProps> = memo(({ className, ready = true
 		}
 	);
 
-	useEffect(() => {
-		const listener = ({ x, y }: GamepadStick) =>
-			move({
-				up: y <= -STICK_THRESHOLD,
-				down: y >= STICK_THRESHOLD,
-				left: x <= -STICK_THRESHOLD,
-				right: x >= STICK_THRESHOLD,
-			});
-
-		allGamepadDirection.on("value", listener);
-
-		return () => allGamepadDirection.off("value", listener);
-	});
+	useEventDispatcher(allGamepadDirection, ({ x, y }) =>
+		move({
+			up: y <= -STICK_THRESHOLD,
+			down: y >= STICK_THRESHOLD,
+			left: x <= -STICK_THRESHOLD,
+			right: x >= STICK_THRESHOLD,
+		})
+	);
 
 	useWindowHandler(
 		(e) => {
