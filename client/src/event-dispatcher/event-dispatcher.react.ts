@@ -7,10 +7,10 @@ export const useEventDispatcher = <T>(
 	listener: (value: T) => unknown,
 	dependencies: DependencyList = []
 ) => {
-  const stable = useCallbackStable(listener);
+	const stable = useCallbackStable(listener);
 	useEffect(() => {
 		dispatcher.on("value", stable);
 		return () => dispatcher.off("value", stable);
-	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, dependencies);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [dispatcher, ...dependencies]);
 };
