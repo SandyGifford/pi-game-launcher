@@ -30,3 +30,11 @@ export const mapToObject = <T, K extends string | number | symbol, V>(
 		},
 		{} as { readonly [KEY in K]: V }
 	);
+
+export const arrayOfAll =
+	<T>() =>
+	<const A extends readonly T[]>(
+		...values: A &
+			(Exclude<T, A[number]> extends never ? unknown : ["Missing", Exclude<T, A[number]>])
+	) =>
+		values;
