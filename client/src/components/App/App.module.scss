@@ -23,14 +23,6 @@
 	--App--background-dark: var(--surface-dark);
 }
 
-@keyframes background-track {
-	0% {
-		background-position: 0% 0%;
-	}
-	100% {
-		background-position: 100% 100%;
-	}
-}
 @keyframes background-rotate {
 	0% {
 		transform: rotate(0);
@@ -74,9 +66,7 @@
 			var(--App--background-dark) 100%
 		);
 		background-size: 200% 200%;
-		animation:
-			background-track calc(var(--App--background-animate-time) / 3) ease-in-out infinite alternate,
-			background-rotate var(--App--background-animate-time) ease-in-out infinite forwards;
+		animation: background-rotate var(--App--background-animate-time) ease-in-out infinite forwards;
 
 		@at-root {
 			@media (prefers-reduced-motion: reduce) {
@@ -94,10 +84,10 @@
 	right: 0;
 	transition: fn.transition(transform, opacity);
 	transform: translateX(100%);
-  opacity: 0;
-  
+	opacity: 0;
+
 	&--show {
-    transform: translateX(fn.spacing(-1));
-    opacity: 1;
+		transform: translateX(fn.spacing(-1));
+		opacity: 1;
 	}
 }
