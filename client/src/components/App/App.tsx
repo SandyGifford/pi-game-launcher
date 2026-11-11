@@ -29,6 +29,8 @@ export const App: FC<AppProps> = memo(({ className }) => {
 
 	const setView = useCallbackStable<SetView>((view, ...args) => setViewState({ view, args }));
 
+	const goBack = useCallbackStable(() => setViewState(DEFAULT_VIEW));
+
 	useEffect(() => {
 		// animate briefly on mount
 		thinkWhile(() => awaitTime(1000));
@@ -47,7 +49,7 @@ export const App: FC<AppProps> = memo(({ className }) => {
 				</TransitionGroup>
 				<button
 					className={clsx(classes.back, !isMainView && classes["back--show"])}
-					onClick={() => setViewState(DEFAULT_VIEW)}
+					onClick={goBack}
 				>
 					→
 				</button>

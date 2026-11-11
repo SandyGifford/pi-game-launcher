@@ -283,5 +283,17 @@ const allGPDirectionsDist = reducerEventDispatcher<GamepadStick>()(
 	}
 );
 
+export const allGamepad = allGPControlsDist.getReadonly();
 export const allGamepadDirection = allGPDirectionsDist.getReadonly();
 export const gamepadByPlayerFamily = gpByPlayerDispFamily.getReadonly();
+
+export const getDispatcherForButton = (
+	button: number | GamepadButtonLabel,
+	player: number | "all" = "all"
+) =>
+	reducerEventDispatcher<GamepadButton>()(
+		EMPTY_BUTTON,
+		[player === "all" ? allGamepad : gamepadByPlayerFamily(player)],
+		([gp]) =>
+			gp?.buttons[typeof button === "number" ? button : resolveButtonIndex(button)] || EMPTY_BUTTON
+	);
