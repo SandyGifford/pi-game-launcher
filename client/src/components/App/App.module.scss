@@ -63,8 +63,9 @@
 		pointer-events: none;
 		background-image: linear-gradient(
 			var(--App--background-light) 0,
-			var(--App--background-dark) 100%
+			var(--App--background-dark) 60%
 		);
+		background-position: top left;
 		background-size: 200% 200%;
 		animation: background-rotate var(--App--background-animate-time) ease-in-out infinite forwards;
 
