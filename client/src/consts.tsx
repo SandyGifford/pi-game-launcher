@@ -1,8 +1,8 @@
 import type { LaunchAction, LaunchActionType } from "@repo/shared";
 import type { ReactNode } from "react";
-import { Homepage } from "./components/Homepage/Homepage";
-import { Settings } from "./components/Settings/Settings";
-import { WebView } from "./components/WebView/WebView";
+import { Homepage } from "./components/views/Homepage/Homepage";
+import { Settings } from "./components/views/Settings/Settings";
+import { WebView } from "./components/ui/WebView/WebView";
 import type { ViewBaseParams } from "./types/view.types";
 
 export const LAUNCH_ACTION_META: {

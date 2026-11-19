@@ -1,0 +1,35 @@
+import type { Launchable } from "@repo/shared";
+import clsx from "clsx";
+import type { FC } from "react";
+import { memo } from "react";
+import classes from "./LaunchableButton.module.scss";
+import {
+  ButtonGroupButton,
+  type ButtonGroupButtonProps,
+} from "../button-group/components/ButtonGroupButton/ButtonGroupButton";
+import { launch } from "../../../api";
+
+export type LaunchableButtonProps = {
+  readonly launchable: Launchable;
+} & Omit<ButtonGroupButtonProps, "thinkingId" | "children">;
+
+export const LaunchableButton: FC<LaunchableButtonProps> = memo(
+  ({ className, launchable: { id, iconPath, title }, onClick, ...rest }) => {
+    return (
+      <ButtonGroupButton
+        className={clsx("LaunchableButton", className, classes.root)}
+        onClick={async (e) => {
+          await launch(id);
+          await onClick?.(e);
+        }}
+        thinkingId={id}
+        {...rest}
+      >
+        <img className={classes.icon} src={`/icons/${iconPath}`} />
+        <span className={classes.title}>{title}</span>
+      </ButtonGroupButton>
+    );
+  }
+);
+
+LaunchableButton.displayName = "LaunchableButton";

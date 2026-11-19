@@ -2,7 +2,7 @@ import type { FC } from "react";
 import { memo } from "react";
 import classes from "./WebView.module.scss";
 import clsx from "clsx";
-import { useViewReady } from "../View/View.ctx";
+import { useViewReady } from "../../View/View.ctx";
 
 export type WebViewProps = {
 	readonly className?: string;
