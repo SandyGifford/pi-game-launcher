@@ -8,6 +8,10 @@
 	--control-fg: white;
 }
 
+body {
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
 @include theme-tools.define-color-palette("surface", #334, $step-down: 0.53);
 @include theme-tools.define-color-palette(
 	"control",

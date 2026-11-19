@@ -30,6 +30,7 @@
 }
 
 button {
+	font-family: inherit;
 	background-color: var(--button--background-light);
 	background-image: linear-gradient(
 		var(--button--background-rotate),
