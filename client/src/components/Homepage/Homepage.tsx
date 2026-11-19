@@ -2,9 +2,9 @@ import { awaitTime } from "@repo/shared";
 import clsx from "clsx";
 import type { FC } from "react";
 import { memo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { getLaunchables, needsUpdate, restart, shutdown, updateAndReload } from "../../api";
 import { useAppContext } from "../../contexts/AppContext.ctx";
-import { usePromise } from "../../hooks/usePromise.hook";
 import { ButtonGroup } from "../button-group/components/ButtonGroup/ButtonGroup";
 import { ButtonGroupRow } from "../button-group/components/ButtonGroupRow/ButtonGroupRow";
 import { LaunchableButton } from "../LaunchableButton/LaunchableButton";
@@ -20,26 +20,26 @@ export const Homepage: FC<HomepageProps> = memo(({ className }) => {
 	useViewReadyOnMount();
 	const { setView } = useAppContext();
 
-	const { status, data } = usePromise(
-		// slightly delay apppearance of launchable buttons
-		async () => (await Promise.all([awaitTime(1000), getLaunchables()]))[1],
-		[]
-	);
+	const { status, data } = useQuery({
+		queryKey: ["launchables"],
+		queryFn: async () => (await Promise.all([awaitTime(1000), getLaunchables()]))[1],
+		retry: false,
+	});
 
-	const { data: updateAvailable } = usePromise(
-		// delay update button so it grabs attention by popping in
-		async () => (await Promise.all([awaitTime(2000), needsUpdate()]))[1],
-		[]
-	);
+	const { data: updateAvailable } = useQuery({
+		queryKey: ["system", "update", "needs"],
+		queryFn: async () => (await Promise.all([awaitTime(2000), needsUpdate()]))[1],
+		retry: false,
+	});
 
-	const isReady = status === "data";
+	const isReady = status === "success";
 
 	return (
 		<ButtonGroup className={clsx("Homepage", className, classes.root)} ready={isReady}>
 			<ButtonGroupRow gap="wide">
 				{(() => {
 					switch (status) {
-						case "data":
+						case "success":
 							return data.map((launchable) => (
 								<LaunchableButton
 									key={launchable.id}
