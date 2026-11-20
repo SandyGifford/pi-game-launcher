@@ -23,7 +23,7 @@
 
 button,
 [role="button"] {
-	@include mi.theme-selector {
+	@include mi.theme-selector(button) {
 		font-family: inherit;
 		background-color: var(--button--background-light);
 		background-image: linear-gradient(

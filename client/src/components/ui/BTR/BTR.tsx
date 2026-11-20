@@ -10,7 +10,7 @@ export type BTRProps = React.DetailedHTMLProps<
 export const BTR: FC<BTRProps> = memo(({ className, children, ...rest }) => {
 	return (
 		<tr
-			className={clsx("BTR", "no-theme", className, classes.root)}
+			className={clsx("BTR", "no-theme-button", className, classes.root)}
 			tabIndex={0}
 			role="button"
 			{...rest}

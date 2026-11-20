@@ -8,33 +8,40 @@
 
 table,
 [role="table"] {
-	@include mi.theme-selector {
+	@include mi.theme-selector(table) {
 		border-collapse: collapse;
 	}
 }
 
 thead {
-	@include mi.theme-selector {
+	@include mi.theme-selector(thead) {
 		&::after {
 			content: "";
 			display: table-row;
 			height: fn.spacing(0.5);
 		}
 	}
+
+	tr,
+	[role="rows"] {
+		@include mi.theme-selector(tr) {
+			box-shadow: fn.shadow();
+		}
+	}
 }
 
 tr,
 [role="rows"] {
-	@include mi.theme-selector {
+	@include mi.theme-selector(tr) {
 		border-radius: var(--radius);
-		box-shadow: fn.raised-glass();
+    overflow: hidden;
 	}
 }
 
 td,
 th,
 [role="cell"] {
-	@include mi.theme-selector {
+	@include mi.theme-selector(th-td) {
 		padding: fn.spacing(0.5, 1);
 
 		&:first-child {
@@ -55,14 +62,14 @@ td,
 [role="cell"] {
 	text-align: left;
 
-	@include mi.theme-selector {
+	@include mi.theme-selector(td) {
 	}
 }
 
 th {
 	text-align: left;
 
-	@include mi.theme-selector {
+	@include mi.theme-selector(th) {
 		background-color: #{alpha }(from var(--table--header-background) / 0.75);
 	}
 }

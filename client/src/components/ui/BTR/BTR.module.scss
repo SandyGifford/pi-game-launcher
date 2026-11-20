@@ -1,5 +1,21 @@
 @use "../../../fn.scss";
 
 .root {
-  cursor: pointer;
+	cursor: pointer;
+	transition: fn.transition(transform, box-shadow);
+	outline: none;
+
+	& > td {
+		transition: fn.transition(background-color);
+	}
+
+	&:focus,
+	&:hover {
+		transform: scale(1.05);
+		box-shadow: fn.shadow();
+
+		& > td {
+			background-color: #{alpha }(from var(--color-surface-2) / 0.75);
+		}
+	}
 }

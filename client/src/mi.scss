@@ -1,7 +1,7 @@
 @use "sass:string";
 
-@mixin theme-selector() {
-	&:where(:not(.no-theme)) {
+@mixin theme-selector($name) {
+	&:where(:not(.no-theme):not(.no-theme-#{$name})) {
 		@content;
 	}
 }
