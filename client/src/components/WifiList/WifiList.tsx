@@ -7,32 +7,41 @@ import { AnimatedList } from "../animated-list/components/AnimatedList/AnimatedL
 import { AnimatedListItem } from "../animated-list/components/AnimatedListItem/AnimatedListItem";
 import classes from "./WifiList.module.scss";
 import { Signal } from "../Signal/Signal";
+import { Loading } from "../ui/Loading/Loading";
 
 export type WifiListProps = {
 	readonly className?: string;
 };
 
 export const WifiList: FC<WifiListProps> = memo(({ className }) => {
-	const { data } = useQuery({
+	const { data, isFetching } = useQuery({
 		queryKey: ["wifi-list"],
 		queryFn: getWifiList,
-		retry: false,
+		refetchOnMount: true,
+		refetchOnWindowFocus: true,
+		refetchInterval: 10000,
 	});
 
 	return (
-		<AnimatedList className={clsx("WifiList", className, classes.root)}>
-			{data
-				?.filter(({ hidden }) => !hidden)
-				.map(({ ssid, bssid, inUse, security, signal }) => (
-					<AnimatedListItem key={bssid}>
-						<button className={clsx("no-theme", classes.network)}>
-							<div className={classes.inUse}>{inUse && "•"}</div>
-							<div className={classes.ssid}>{ssid}</div>
-							<div className={classes.security}>{security.length ? "🔒" : undefined}</div>
-							<Signal className={classes.signal} strength={signal} />
-						</button>
-					</AnimatedListItem>
-				))}
-		</AnimatedList>
+		<div className={clsx("WifiList", className, classes.root)}>
+			<h1 className={clsx(classes.header, isFetching && classes["header--loading"])}>
+				<span className={classes.header__text}>Available WiFi networks</span>{" "}
+				<Loading className={clsx(classes.header__loader)} stop={!isFetching} />
+			</h1>
+			<AnimatedList>
+				{data
+					?.filter(({ hidden }) => !hidden)
+					.map(({ ssid, bssid, inUse, security, signal }) => (
+						<AnimatedListItem key={bssid}>
+							<button className={clsx("no-theme", classes.network)}>
+								<div className={classes.inUse}>{inUse && "•"}</div>
+								<div className={classes.ssid}>{ssid}</div>
+								<div className={classes.security}>{security.length ? "🔒" : undefined}</div>
+								<Signal className={classes.signal} strength={signal} />
+							</button>
+						</AnimatedListItem>
+					))}
+			</AnimatedList>
+		</div>
 	);
 });
