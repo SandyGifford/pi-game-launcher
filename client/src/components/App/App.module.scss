@@ -19,8 +19,8 @@
 }
 
 :root {
-	--App--background-light: var(--surface);
-	--App--background-dark: var(--surface-dark);
+	--App--background-light: var(--mantine-color-dark-8);
+	--App--background-dark: var(--mantine-color-dark-9);
 }
 
 @keyframes background-rotate {
@@ -36,7 +36,7 @@
 	position: relative;
 	isolation: isolate;
 	overflow: hidden;
-	color: var(--color-fg);
+	color: var(--mantine-color-text);
 	background-color: var(--App--background-dark);
 	width: 100vw;
 	height: 100vh;
@@ -47,8 +47,8 @@
 
 	&--thinking {
 		--App--background-animate-time: 10s;
-		--App--background-light: color-mix(in oklab, var(--surface) 60%, #5a4bd6);
-		--App--background-dark: color-mix(in oklab, var(--surface-dark) 60%, #1b1250);
+		--App--background-light: color-mix(in oklab, var(--mantine-color-dark-8) 60%, #5a4bd6);
+		--App--background-dark: color-mix(in oklab, var(--mantine-color-dark-9) 60%, #1b1250);
 	}
 
 	&::before {

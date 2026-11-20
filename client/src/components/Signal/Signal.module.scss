@@ -11,7 +11,7 @@
 	--Signal--bar-unit: calc(1em / var(--Signal--bar-total));
 
 	position: relative;
-	background: var(--color-surface-3);
+	background: var(--mantine-color-surface-7);
 
 	width: var(--Signal--bar-unit);
 	height: calc(var(--Signal--bar-unit) * (var(--Signal--bar-index) + 1));
@@ -21,7 +21,7 @@
 
 	&::after {
 		content: "";
-		background: var(--color-surface-9);
+		background: var(--mantine-color-surface-1);
 		position: absolute;
 		left: 0;
 		right: 0;

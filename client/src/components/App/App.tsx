@@ -1,4 +1,5 @@
 import { awaitTime } from "@repo/shared";
+import { Button } from "@mantine/core";
 import clsx from "clsx";
 import type { FC } from "react";
 import { memo, useEffect, useState } from "react";
@@ -47,13 +48,13 @@ export const App: FC<AppProps> = memo(({ className }) => {
 						}
 					</View>
 				</TransitionGroup>
-				<button
+				<Button
 					className={clsx(classes.back, !isMainView && classes["back--show"])}
 					onClick={goBack}
 					inert={isMainView}
 				>
 					→
-				</button>
+				</Button>
 			</div>
 		</AppContext>
 	);

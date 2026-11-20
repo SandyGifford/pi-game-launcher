@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { Button } from "@mantine/core";
 import clsx from "clsx";
 import type { FC } from "react";
 import { memo } from "react";
@@ -33,12 +34,19 @@ export const WifiList: FC<WifiListProps> = memo(({ className }) => {
 					?.filter(({ hidden }) => !hidden)
 					.map(({ ssid, bssid, inUse, security, signal }) => (
 						<AnimatedListItem key={bssid}>
-							<button className={clsx("no-theme", classes.network)}>
+							<Button
+								variant="subtle"
+								className={classes.network}
+								classNames={{
+									inner: classes.network__inner,
+									label: classes.network__label,
+								}}
+							>
 								<div className={classes.inUse}>{inUse && "•"}</div>
 								<div className={classes.ssid}>{ssid}</div>
 								<div className={classes.security}>{security.length ? "🔒" : undefined}</div>
 								<Signal className={classes.signal} strength={signal} />
-							</button>
+							</Button>
 						</AnimatedListItem>
 					))}
 			</AnimatedList>

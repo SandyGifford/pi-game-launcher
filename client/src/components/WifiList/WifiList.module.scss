@@ -42,23 +42,35 @@
 }
 
 .network {
-	all: unset;
 	cursor: pointer;
 	display: flex;
 	gap: fn.spacing();
 	align-items: center;
 	width: 100%;
+	height: auto;
+	min-height: 0;
 	box-sizing: border-box;
 	transition: fn.transition(transform, background-color);
 	user-select: none;
 	padding: fn.spacing(0.5, 3, 0.5, 1);
 	border-radius: fn.radius();
+	font: inherit;
+	text-align: left;
+	color: inherit;
 
 	&:focus,
 	&:hover {
 		transform: scale(1.1);
-		background: var(--color-surface-4);
+		background: var(--mantine-color-surface-6);
 	}
+}
+
+.network__inner,
+.network__label {
+	display: flex;
+	align-items: center;
+	gap: fn.spacing();
+	width: 100%;
 }
 
 .inUse {

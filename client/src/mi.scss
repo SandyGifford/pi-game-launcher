@@ -1,11 +1,5 @@
 @use "sass:string";
 
-@mixin theme-selector($name) {
-	&:where(:not(.no-theme):not(.no-theme-#{$name})) {
-		@content;
-	}
-}
-
 @mixin theme-property($name, $root-value: false) {
 	@property #{$name} {
 		inherits: true;

@@ -23,11 +23,11 @@
 }
 
 @function spacing($ns...) {
-	@return list-multiplier-fn(var(--spacing), $ns...);
+	@return list-multiplier-fn(var(--mantine-spacing-sm), $ns...);
 }
 
 @function radius($ns...) {
-	@return list-multiplier-fn(var(--radius), $ns...);
+	@return list-multiplier-fn(var(--mantine-radius-default), $ns...);
 }
 
 @function shadow() {

@@ -18,6 +18,7 @@ export const LaunchableButton: FC<LaunchableButtonProps> = memo(
     return (
       <ButtonGroupButton
         className={clsx("LaunchableButton", className, classes.root)}
+        classNames={{ inner: classes.inner, label: classes.label }}
         onClick={async (e) => {
           await launch(id);
           await onClick?.(e);
