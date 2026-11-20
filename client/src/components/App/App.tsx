@@ -50,6 +50,7 @@ export const App: FC<AppProps> = memo(({ className }) => {
 				<button
 					className={clsx(classes.back, !isMainView && classes["back--show"])}
 					onClick={goBack}
+					inert={isMainView}
 				>
 					→
 				</button>
