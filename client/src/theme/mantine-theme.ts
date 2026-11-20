@@ -25,6 +25,7 @@ const button = Button.extend({
 	}),
 	styles: (_theme, props) => ({
 		root: {
+			outline: "none",
 			...(props.variant === "subtle"
 				? {}
 				: {
