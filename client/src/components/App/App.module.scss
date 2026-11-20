@@ -67,7 +67,7 @@
 		);
 		background-position: top left;
 		background-size: 200% 200%;
-		animation: background-rotate var(--App--background-animate-time) ease-in-out infinite forwards;
+		// animation: background-rotate var(--App--background-animate-time) ease-in-out infinite forwards;
 
 		@at-root {
 			@media (prefers-reduced-motion: reduce) {

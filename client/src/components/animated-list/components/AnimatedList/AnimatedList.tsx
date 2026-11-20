@@ -1,9 +1,12 @@
 import clsx from "clsx";
-import type { FC, ReactNode } from "react";
-import { Children, cloneElement, memo, useEffect, useMemo, useState } from "react";
+import type { FC, ReactElement, ReactNode } from "react";
+import { Children, cloneElement, memo, useEffect, useMemo, useRef, useState } from "react";
 import { useCallbackStable } from "../../../../hooks/useCallbackStable.hook";
 import { AnimatedListProvider, type AnimatedListCtxUseHeight } from "../../animated-list.ctx";
-import { isAnimatedListItemElement } from "../AnimatedListItem/AnimatedListItem";
+import {
+	isAnimatedListItemElement,
+	type AnimatedListItemProps,
+} from "../AnimatedListItem/AnimatedListItem";
 import classes from "./AnimatedList.module.scss";
 import { TransitionGroup } from "react-transition-group";
 
@@ -14,6 +17,7 @@ export type AnimatedListProps = {
 
 export const AnimatedList: FC<AnimatedListProps> = memo(({ className, children }) => {
 	const [heightMap, setHeightMap] = useState<{ readonly [KEY in string]: number }>({});
+	const mountOrderRef = useRef(new Map<string, ReactElement<AnimatedListItemProps>>());
 
 	const fullHeight = useMemo(
 		() => Object.values(heightMap).reduce((total, height) => total + height, 0),
@@ -32,6 +36,33 @@ export const AnimatedList: FC<AnimatedListProps> = memo(({ className, children }
 	});
 
 	let currentTop = 0;
+	const currentKeys = new Set<string>();
+
+	Children.toArray(children).forEach((child, index) => {
+		if (!isAnimatedListItemElement(child)) return;
+
+		const key = child.props.listKey ?? child.key ?? undefined;
+		const reactKey = child.key ?? String(index);
+		const fixedTop = currentTop;
+		currentTop += (typeof key === "string" && heightMap[key]) || 0;
+		currentKeys.add(reactKey);
+
+		mountOrderRef.current.set(
+			reactKey,
+			cloneElement(child, {
+				...child.props,
+				listKey: key,
+				fixedTop,
+				style: { zIndex: index, ...child.props.style },
+			})
+		);
+	});
+
+	for (const key of mountOrderRef.current.keys()) {
+		if (!currentKeys.has(key)) {
+			mountOrderRef.current.delete(key);
+		}
+	}
 
 	return (
 		<ul
@@ -39,19 +70,7 @@ export const AnimatedList: FC<AnimatedListProps> = memo(({ className, children }
 			style={{ "--AnimatedList--height": `${fullHeight}px` }}
 		>
 			<AnimatedListProvider useHeight={useHeight}>
-				<TransitionGroup component={null}>
-					{Children.toArray(children).map((c) => {
-						if (isAnimatedListItemElement(c)) {
-							const key = c.props.listKey ?? c.key ?? undefined;
-							const fixedTop = currentTop;
-
-							currentTop += (typeof key === "string" && heightMap[key]) || 0;
-
-							return cloneElement(c, { ...c.props, listKey: key, fixedTop });
-						}
-						return undefined;
-					})}
-				</TransitionGroup>
+				<TransitionGroup component={null}>{[...mountOrderRef.current.values()]}</TransitionGroup>
 			</AnimatedListProvider>
 		</ul>
 	);
