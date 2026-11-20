@@ -1,12 +1,12 @@
 @use "../fn.scss";
 @use "../mi.scss";
 
-@include mi.theme-property(--button--background-light, "alpha(from var(--control-light) / 0.5)") {
+@include mi.theme-property(--button--background-light, #{alpha }(from var(--control-light) / 0.5)) {
 	syntax: "<color>";
 	initial-value: rgb(80, 80, 106, 0.5);
 }
 
-@include mi.theme-property(--button--background-dark, "alpha(from var(--control) / 0.75)") {
+@include mi.theme-property(--button--background-dark, #{alpha }(from var(--control) / 0.75)) {
 	syntax: "<color>";
 	initial-value: rgb(80, 80, 106, 0.5);
 }

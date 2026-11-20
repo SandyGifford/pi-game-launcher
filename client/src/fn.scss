@@ -1,6 +1,14 @@
 @use "sass:list";
 
-@function spacing($ns...) {
+@function trn($condition, $if-true, $if-false) {
+	@if ($condition) {
+		@return $if-true;
+	} @else {
+		@return $if-false;
+	}
+}
+
+@function list-multiplier-fn($mult, $ns...) {
 	@if list.length($ns) == 0 {
 		$ns: (1);
 	}
@@ -8,24 +16,30 @@
 	$list: ();
 
 	@each $n in $ns {
-		$list: list.append($list, calc(var(--spacing) * $n));
+		$list: list.append($list, trn($n==1, $mult, calc($mult * $n)));
 	}
 
 	@return $list;
 }
 
+@function spacing($ns...) {
+	@return list-multiplier-fn(var(--spacing), $ns...);
+}
+
 @function radius($ns...) {
-	@if list.length($ns) == 0 {
-		$ns: (1);
-	}
+	@return list-multiplier-fn(var(--radius), $ns...);
+}
 
-	$list: ();
+@function shadow() {
+	@return spacing(0.25, 0.25, 1.5, 0) rgba(0, 0, 0, 0.25);
+}
 
-	@each $n in $ns {
-		$list: list.append($list, calc(var(--radius) * $n));
-	}
+@function raised-glass() {
+	@return shadow(), inset spacing(1.5, 1.5, 1, -1) rgba(255, 255, 255, 0.5);
+}
 
-	@return $list;
+@function shine() {
+	@return inset spacing(2.25, 2.25, 1.5, -2) rgba(255, 255, 255, 0.5);
 }
 
 @function transition($props...) {

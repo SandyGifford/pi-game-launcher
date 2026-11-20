@@ -1,7 +1,7 @@
 @use "../fn.scss";
 @use "../mi.scss";
 
-@include mi.theme-property(--table--header-background, "alpha(from var(--surface-10) / 0.5)") {
+@include mi.theme-property(--table--header-background, #{alpha }(from var(--surface-10) / 0.5)) {
 	syntax: "<color>";
 	initial-value: rgb(80, 80, 106, 0.5);
 }
@@ -26,6 +26,8 @@ thead {
 tr,
 [role="rows"] {
 	@include mi.theme-selector {
+		border-radius: var(--radius);
+		box-shadow: fn.raised-glass();
 	}
 }
 
@@ -61,6 +63,6 @@ th {
 	text-align: left;
 
 	@include mi.theme-selector {
-		background-color: var(--table--header-background);
+		background-color: #{alpha }(from var(--table--header-background) / 0.75);
 	}
 }

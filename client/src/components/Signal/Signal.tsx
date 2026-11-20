@@ -18,7 +18,7 @@ export const Signal: FC<SignalProps> = memo(({ className, bars = 3, strength }) 
 		<div
 			className={clsx("Signal", className, classes.root)}
 			style={{
-				"--Signal-bar-total": bars,
+				"--Signal--bar-total": bars,
 			}}
 		>
 			{mapTimes(bars, (i) => {
@@ -27,8 +27,8 @@ export const Signal: FC<SignalProps> = memo(({ className, bars = 3, strength }) 
 						className={classes.bar}
 						key={i}
 						style={{
-							"--Signal-bar-index": i,
-							"--Signal-bar-strength": (() => {
+							"--Signal--bar-index": i,
+							"--Signal--bar-strength": (() => {
 								if (partialBarIndex === i) return partialFill;
 								return i / bars < strength ? 1 : 0;
 							})(),
