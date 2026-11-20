@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { memo, type FC } from "react";
+import { forwardRef, memo } from "react";
 import classes from "./BTR.module.scss";
 
 export type BTRProps = React.DetailedHTMLProps<
@@ -7,15 +7,18 @@ export type BTRProps = React.DetailedHTMLProps<
 	HTMLTableRowElement
 >;
 
-export const BTR: FC<BTRProps> = memo(({ className, children, ...rest }) => {
-	return (
-		<tr
-			className={clsx("BTR", "no-theme-button", className, classes.root)}
-			tabIndex={0}
-			role="button"
-			{...rest}
-		>
-			{children}
-		</tr>
-	);
-});
+export const BTR = memo(
+	forwardRef<HTMLTableRowElement, BTRProps>(({ className, children, ...rest }, ref) => {
+		return (
+			<tr
+				className={clsx("BTR", "no-theme-button", className, classes.root)}
+				tabIndex={0}
+				role="button"
+				ref={ref}
+				{...rest}
+			>
+				{children}
+			</tr>
+		);
+	})
+);

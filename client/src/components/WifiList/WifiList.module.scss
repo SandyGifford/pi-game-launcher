@@ -2,3 +2,44 @@
 
 .root {
 }
+
+@keyframes row-enter {
+	from {
+		height: 0;
+		padding-top: 0;
+		padding-bottom: 0;
+		opacity: 0;
+	}
+
+	to {
+		height: calc(28px - var(--spacing));
+		padding-top: fn.spacing(0.5);
+		padding-bottom: fn.spacing(0.5);
+		opacity: 1;
+	}
+}
+
+.row {
+	& > td {
+		overflow: hidden;
+		height: auto;
+		padding-top: fn.spacing(0.5);
+		padding-bottom: fn.spacing(0.5);
+	}
+
+	&--entering > td {
+		animation: row-enter 500ms ease both;
+	}
+
+	&--exiting > td {
+		animation: row-enter 500ms ease reverse both;
+	}
+
+	&--exited > td,
+	&--unmounted > td {
+		height: 0;
+		padding-top: 0;
+		padding-bottom: 0;
+    opacity: 0;
+	}
+}

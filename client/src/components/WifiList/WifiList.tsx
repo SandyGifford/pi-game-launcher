@@ -6,6 +6,8 @@ import { Signal } from "../Signal/Signal";
 import { BTR } from "../ui/BTR/BTR";
 import { useQuery } from "@tanstack/react-query";
 import { getWifiList } from "../../api";
+import { TransitionGroup } from "react-transition-group";
+import { AutoRefTransition } from "../ui/AutoRefTransition/AutoRefTransition";
 
 export type WifiListProps = {
 	readonly className?: string;
@@ -28,21 +30,32 @@ export const WifiList: FC<WifiListProps> = memo(({ className }) => {
 					<th></th>
 				</tr>
 			</thead>
-			<tbody>
-				{data?.map(
-					({ ssid, bssid, hidden, inUse, security, signal }) =>
-						!hidden && (
-							<BTR key={bssid}>
-								<td>{inUse && "•"}</td>
-								<td>{ssid}</td>
-								<td>{security}</td>
-								<td>
-									<Signal strength={signal} />
-								</td>
-							</BTR>
-						)
-				)}
-			</tbody>
+			<TransitionGroup component="tbody">
+				{data
+					?.filter(({ hidden }) => !hidden)
+					.map(({ ssid, bssid, inUse, security, signal }) => (
+						<AutoRefTransition timeout={500} key={bssid}>
+							{(state) => (
+								<BTR className={classes[`row--${state}`]}>
+									<td>
+										<div>{inUse && "•"}</div>
+									</td>
+									<td>
+										<div>{ssid}</div>
+									</td>
+									<td>
+										<div>{security}</div>
+									</td>
+									<td>
+										<div>
+											<Signal strength={signal} />
+										</div>
+									</td>
+								</BTR>
+							)}
+						</AutoRefTransition>
+					))}
+			</TransitionGroup>
 		</table>
 	);
 });
