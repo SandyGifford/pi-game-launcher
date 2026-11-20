@@ -1,0 +1,31 @@
+@use "../../fn.scss";
+
+.root {
+	width: 1em;
+	height: 1em;
+	display: flex;
+	align-items: end;
+}
+
+.bar {
+	--Signal-bar-unit: calc(1em / var(--Signal-bar-total));
+
+	position: relative;
+	background: var(--color-surface-3);
+
+	width: var(--Signal-bar-unit);
+	height: calc(var(--Signal-bar-unit) * (var(--Signal-bar-index) + 1));
+
+	border-radius: fn.radius();
+	overflow: hidden;
+
+	&::after {
+		content: "";
+		background: var(--color-surface-9);
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		height: calc(100% * var(--Signal-bar-strength));
+	}
+}

@@ -1,0 +1,20 @@
+@use "sass:string";
+
+@mixin theme-selector() {
+	&:where(:not(.no-theme)) {
+		@content;
+	}
+}
+
+@mixin theme-property($name, $root-value: false) {
+	@property #{$name} {
+		inherits: true;
+		@content;
+	}
+
+	@if $root-value {
+		:root {
+			#{$name}: string.unquote($root-value);
+		}
+	}
+}

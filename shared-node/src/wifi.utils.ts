@@ -77,5 +77,5 @@ export const getWifiList = async (): Promise<readonly WifiAccessPoint[]> => {
 			}
 		});
 
-	return [...collected.values()];
+	return [...collected.values()].sort((a, b) => b.signal - a.signal);
 };

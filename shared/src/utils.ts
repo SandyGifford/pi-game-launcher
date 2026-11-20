@@ -38,3 +38,6 @@ export const arrayOfAll =
 			(Exclude<T, A[number]> extends never ? unknown : ["Missing", Exclude<T, A[number]>])
 	) =>
 		values;
+
+export const mapTimes = <T>(count: number, fn: (i: number) => T): readonly T[] =>
+	Array.from({ length: count }, (_, i) => fn(i));

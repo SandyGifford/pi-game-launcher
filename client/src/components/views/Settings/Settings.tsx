@@ -4,7 +4,8 @@ import classes from "./Settings.module.scss";
 import clsx from "clsx";
 import { useQuery } from "@tanstack/react-query";
 import { getWifiList } from "../../../api";
-import { ButtonTableRow } from "../../ui/ButtonTableRow/ButtonTableRow";
+import { BTR } from "../../ui/BTR/BTR";
+import { Signal } from "../../Signal/Signal";
 
 export type SettingsProps = {
 	readonly className?: string;
@@ -23,17 +24,23 @@ export const Settings: FC<SettingsProps> = memo(({ className }) => {
 				<thead>
 					<tr>
 						<th></th>
-						<th>SSID</th>
+						<th>name</th>
+						<th>security</th>
+						<th></th>
 					</tr>
 				</thead>
 				<tbody>
 					{data?.map(
-						({ ssid, bssid, hidden, inUse }) =>
+						({ ssid, bssid, hidden, inUse, security, signal }) =>
 							!hidden && (
-								<ButtonTableRow key={bssid}>
+								<BTR key={bssid}>
 									<td>{inUse && "v"}</td>
 									<td>{ssid}</td>
-								</ButtonTableRow>
+									<td>{security}</td>
+									<td>
+										<Signal strength={signal} />
+									</td>
+								</BTR>
 							)
 					)}
 				</tbody>

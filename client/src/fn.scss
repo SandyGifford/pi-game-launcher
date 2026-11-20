@@ -14,6 +14,20 @@
 	@return $list;
 }
 
+@function radius($ns...) {
+	@if list.length($ns) == 0 {
+		$ns: (1);
+	}
+
+	$list: ();
+
+	@each $n in $ns {
+		$list: list.append($list, calc(var(--radius) * $n));
+	}
+
+	@return $list;
+}
+
 @function transition($props...) {
 	$list: ();
 
