@@ -1,0 +1,29 @@
+@use "../../../../fn.scss";
+
+.root {
+	transition: fn.transitionVals(
+		(height, opacity, padding-top, padding-bottom, margin-top, margin-bottom, transform),
+		var(--AnimatedListitem--duration)
+	);
+
+	height: var(--AnimatedListitem--fixed-height);
+	opacity: 1;
+
+	&--entering,
+	&--entered {
+		height: var(--AnimatedListitem--fixed-height);
+		opacity: 1;
+	}
+
+	&--exiting,
+	&--exited,
+	&--unmounted {
+		height: 0;
+		opacity: 0;
+		padding-top: 0;
+		padding-bottom: 0;
+		margin-top: 0;
+		margin-bottom: 0;
+		transform: translateX(fn.spacing(-2));
+	}
+}

@@ -42,12 +42,16 @@
 	@return shadow(), shine();
 }
 
-@function transition($props...) {
+@function transitionVals($props, $duration: 500ms) {
 	$list: ();
 
 	@each $prop in $props {
-		$list: list.append($list, $prop 500ms, $separator: "comma");
+		$list: list.append($list, $prop $duration, $separator: "comma");
 	}
 
 	@return $list;
+}
+
+@function transition($props...) {
+	@return transitionVals($props);
 }
