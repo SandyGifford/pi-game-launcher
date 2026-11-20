@@ -13,7 +13,7 @@ const [, AnimatedListProvider, useAnimatedList] = createQuickCtx<AnimatedListCtx
 
 export const useAnimatedListItem = (key: string | undefined, el: HTMLElement | null) => {
 	const { useHeight } = useAnimatedList();
-	const { height } = useResizeObserver({ ref: el, box: "border-box" });
+	const { height } = useResizeObserver({ ref: el, box: "content-box" });
 	useHeight(key, height ?? 0);
 };
 

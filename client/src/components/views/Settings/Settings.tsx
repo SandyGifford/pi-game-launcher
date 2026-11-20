@@ -1,8 +1,8 @@
 import clsx from "clsx";
 import type { FC } from "react";
 import { memo } from "react";
-import classes from "./Settings.module.scss";
 import { WifiList } from "../../WifiList/WifiList";
+import classes from "./Settings.module.scss";
 
 export type SettingsProps = {
 	readonly className?: string;

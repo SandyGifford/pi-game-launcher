@@ -7,6 +7,7 @@ export type AutoRefTransitionProps = TransitionProps<HTMLElement>;
 
 export const AutoRefTransition: FC<AutoRefTransitionProps> = memo(({ children, ...rest }) => {
 	const ref = useRef<HTMLElement>(null);
+
 	return (
 		<Transition {...rest} nodeRef={ref}>
 			{(...args) => {
@@ -18,7 +19,19 @@ export const AutoRefTransition: FC<AutoRefTransitionProps> = memo(({ children, .
 				if (isValidElement(resolved))
 					return cloneElement(resolved as ReactElement<{ readonly ref: Ref<HTMLElement> }>, {
 						...(resolved.props as object),
-						ref,
+						ref: (el) => {
+							ref.current = el;
+							const propRef = (resolved.props as { readonly ref?: Ref<HTMLElement> }).ref;
+							if (!propRef) return;
+							switch (typeof propRef) {
+								case "function":
+									propRef(el);
+									break;
+								case "object":
+									propRef.current = el;
+									break;
+							}
+						},
 					});
 
 				return resolved;

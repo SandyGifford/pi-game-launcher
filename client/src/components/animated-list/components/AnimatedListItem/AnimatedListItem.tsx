@@ -5,13 +5,11 @@ import { AutoRefTransition } from "../../../ui/AutoRefTransition/AutoRefTransiti
 import type { InjectableTransitionProps } from "../../../ui/TransitionInjector/TransitionInjector";
 import { useAnimatedListItem } from "../../animated-list.ctx";
 import classes from "./AnimatedListItem.module.scss";
-import type { CNMap } from "../../../../types/dom.types";
 
 export type AnimatedListItemProps = {
 	readonly listKey?: string;
-	readonly fixedHeight?: number;
+	readonly fixedTop?: number;
 	readonly durationMS?: number;
-	readonly cn?: CNMap<"inner">;
 } & InjectableTransitionProps &
 	React.DetailedHTMLProps<React.LiHTMLAttributes<HTMLLIElement>, HTMLLIElement>;
 
@@ -20,7 +18,7 @@ export const AnimatedListItem: FC<AnimatedListItemProps> = memo(
 		className,
 		children,
 		listKey,
-		fixedHeight,
+		fixedTop,
 		style,
 		durationMS = 500,
 		in: inProp,
@@ -28,10 +26,9 @@ export const AnimatedListItem: FC<AnimatedListItemProps> = memo(
 		appear,
 		enter,
 		exit,
-		cn,
 		...rest
 	}) => {
-		const [el, setEl] = useState<HTMLDivElement | null>(null);
+		const [el, setEl] = useState<HTMLLIElement | null>(null);
 		useAnimatedListItem(listKey, el);
 
 		return (
@@ -46,16 +43,15 @@ export const AnimatedListItem: FC<AnimatedListItemProps> = memo(
 				{(state) => (
 					<li
 						className={clsx("AnimatedListItem", className, classes.root, classes[`root--${state}`])}
+						ref={setEl}
 						style={{
-							"--AnimatedListitem--fixed-height": `${fixedHeight}px`,
+							"--AnimatedListitem--fixed-top": `${fixedTop}px`,
 							"--AnimatedListitem--duration": `${durationMS}ms`,
 							...style,
 						}}
 						{...rest}
 					>
-						<div className={clsx(classes.inner, cn?.inner)} ref={setEl}>
-							{children}
-						</div>
+						{children}
 					</li>
 				)}
 			</AutoRefTransition>
