@@ -1,4 +1,5 @@
-import { Button, createTheme, type MantineColorsTuple } from "@mantine/core";
+import { Button, createTheme, Loader, type MantineColorsTuple } from "@mantine/core";
+import { CustomLoader } from "../components/ui/CustomLoader/CustomLoader";
 
 const buttonBackground =
 	"linear-gradient(var(--button--background-rotate), var(--button--background-light) var(--button--background-inset), var(--button--background-dark) 100%)";
@@ -43,6 +44,18 @@ const button = Button.extend({
 				: {}),
 		},
 	}),
+});
+
+const loader = Loader.extend({
+	defaultProps: {
+		color: "pop",
+		size: "1em",
+		type: "launcher",
+		loaders: {
+			...Loader.defaultLoaders,
+			launcher: CustomLoader,
+		},
+	},
 });
 
 const surface: MantineColorsTuple = [
@@ -117,5 +130,6 @@ export const mantineTheme = createTheme({
 	},
 	components: {
 		Button: button,
+		Loader: loader,
 	},
 });

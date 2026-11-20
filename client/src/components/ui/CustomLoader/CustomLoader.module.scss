@@ -1,6 +1,4 @@
-@use "../../../fn.scss";
-
-@keyframes loading-spinner {
+@keyframes custom-loader-spinner {
 	0% {
 		transform: rotate(0);
 	}
@@ -9,24 +7,19 @@
 	}
 }
 
-.root {
-	width: 1em;
-	height: 1em;
+.indicator {
+	width: var(--loader-size);
+	height: var(--loader-size);
 	position: relative;
 
 	&::after {
 		content: "";
 		display: block;
-		background-color: var(--mantine-color-pop-5);
+		background-color: var(--loader-color);
 		width: 100%;
 		height: 50%;
 		border-radius: 1em 1em 0 0;
 		transform-origin: center bottom;
-	}
-
-	&--animate {
-		&::after {
-			animation: loading-spinner 1s ease-in-out infinite forwards;
-		}
+		animation: custom-loader-spinner 1s ease-in-out infinite forwards;
 	}
 }
