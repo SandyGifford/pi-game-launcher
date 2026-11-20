@@ -3,43 +3,44 @@
 .root {
 }
 
-@keyframes row-enter {
-	from {
-		height: 0;
-		padding-top: 0;
-		padding-bottom: 0;
-		opacity: 0;
-	}
+.network {
+	all: unset;
+	cursor: pointer;
+	display: flex;
+	gap: fn.spacing();
+	align-items: center;
+	width: 100%;
+	transition: fn.transition(transform, background-color);
+	user-select: none;
+	padding: fn.spacing(0.5, 3, 0.5, 1);
+	border-radius: fn.radius();
 
-	to {
-		height: calc(28px - var(--spacing));
-		padding-top: fn.spacing(0.5);
-		padding-bottom: fn.spacing(0.5);
-		opacity: 1;
+	&:focus,
+	&:hover {
+		transform: scale(1.1);
+		background: var(--color-surface-4);
 	}
 }
 
-.row {
-	& > td {
-		overflow: hidden;
-		height: auto;
-		padding-top: fn.spacing(0.5);
-		padding-bottom: fn.spacing(0.5);
-	}
+.inUse {
+	flex: 0 0 20px;
+	text-align: center;
+}
 
-	&--entering > td {
-		animation: row-enter 500ms ease both;
-	}
+.ssid {
+	flex: 1 1 auto;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
 
-	&--exiting > td {
-		animation: row-enter 500ms ease reverse both;
-	}
+.security {
+	flex: 0 0 20px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	font-size: 14px;
+}
 
-	&--exited > td,
-	&--unmounted > td {
-		height: 0;
-		padding-top: 0;
-		padding-bottom: 0;
-    opacity: 0;
-	}
+.signal {
 }

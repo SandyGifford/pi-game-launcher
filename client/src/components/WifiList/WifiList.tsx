@@ -1,13 +1,12 @@
+import { useQuery } from "@tanstack/react-query";
+import clsx from "clsx";
 import type { FC } from "react";
 import { memo } from "react";
-import classes from "./WifiList.module.scss";
-import clsx from "clsx";
-import { Signal } from "../Signal/Signal";
-import { BTR } from "../ui/BTR/BTR";
-import { useQuery } from "@tanstack/react-query";
 import { getWifiList } from "../../api";
-import { TransitionGroup } from "react-transition-group";
-import { AutoRefTransition } from "../ui/AutoRefTransition/AutoRefTransition";
+import { AnimatedList } from "../animated-list/components/AnimatedList/AnimatedList";
+import { AnimatedListItem } from "../animated-list/components/AnimatedListItem/AnimatedListItem";
+import classes from "./WifiList.module.scss";
+import { Signal } from "../Signal/Signal";
 
 export type WifiListProps = {
 	readonly className?: string;
@@ -21,41 +20,19 @@ export const WifiList: FC<WifiListProps> = memo(({ className }) => {
 	});
 
 	return (
-		<table className={clsx("WifiList", className, classes.root)}>
-			<thead>
-				<tr>
-					<th></th>
-					<th>name</th>
-					<th>security</th>
-					<th></th>
-				</tr>
-			</thead>
-			<TransitionGroup component="tbody">
-				{data
-					?.filter(({ hidden }) => !hidden)
-					.map(({ ssid, bssid, inUse, security, signal }) => (
-						<AutoRefTransition timeout={500} key={bssid}>
-							{(state) => (
-								<BTR className={classes[`row--${state}`]}>
-									<td>
-										<div>{inUse && "•"}</div>
-									</td>
-									<td>
-										<div>{ssid}</div>
-									</td>
-									<td>
-										<div>{security}</div>
-									</td>
-									<td>
-										<div>
-											<Signal strength={signal} />
-										</div>
-									</td>
-								</BTR>
-							)}
-						</AutoRefTransition>
-					))}
-			</TransitionGroup>
-		</table>
+		<AnimatedList className={clsx("WifiList", className, classes.root)}>
+			{data
+				?.filter(({ hidden }) => !hidden)
+				.map(({ ssid, bssid, inUse, security, signal }) => (
+					<AnimatedListItem key={bssid}>
+						<button className={clsx("no-theme", classes.network)}>
+							<div className={classes.inUse}>{inUse && "•"}</div>
+							<div className={classes.ssid}>{ssid}</div>
+							<div className={classes.security}>{security.length ? "🔒" : undefined}</div>
+							<Signal className={classes.signal} strength={signal} />
+						</button>
+					</AnimatedListItem>
+				))}
+		</AnimatedList>
 	);
 });
