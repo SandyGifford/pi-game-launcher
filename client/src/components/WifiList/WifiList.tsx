@@ -7,6 +7,7 @@ import { getWifiList } from "../../api";
 import { AnimatedList } from "../animated-list/components/AnimatedList/AnimatedList";
 import { AnimatedListItem } from "../animated-list/components/AnimatedListItem/AnimatedListItem";
 import { Signal } from "../Signal/Signal";
+import { IconLock } from "@tabler/icons-react";
 import classes from "./WifiList.module.scss";
 
 export type WifiListProps = {
@@ -43,7 +44,7 @@ export const WifiList: FC<WifiListProps> = memo(({ className }) => {
 							>
 								<div className={classes.inUse}>{inUse && "•"}</div>
 								<div className={classes.ssid}>{ssid}</div>
-								<div className={classes.security}>{security.length ? "🔒" : undefined}</div>
+								<div className={classes.security}>{security.length ? <IconLock size="small" stroke={1} /> : undefined}</div>
 								<Signal className={classes.signal} strength={signal} />
 							</Button>
 						</AnimatedListItem>
