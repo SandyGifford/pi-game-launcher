@@ -1,8 +1,8 @@
 import clsx from "clsx";
-import { forwardRef, memo, useEffect, useRef, type MouseEventHandler } from "react";
+import { forwardRef, memo, type MouseEventHandler } from "react";
 import type { OverrideProperties } from "type-fest";
 import { useCallbackStable } from "../../../../../hooks/useCallbackStable.hook";
-import { useButtonGroup, useButtonGroupRow } from "../../button-group.ctx";
+import { useView } from "../../../../View/View.ctx";
 import classes from "./ButtonGroupButton.module.scss";
 import { AsyncButton, type AsyncButtonProps } from "../../../AsyncButton/AsyncButton";
 
@@ -20,9 +20,7 @@ export type ButtonGroupButtonProps = OverrideProperties<
 export const ButtonGroupButton = memo(
   forwardRef<HTMLButtonElement, ButtonGroupButtonProps>(
     ({ className, hidden, children, onClick, thinkingId, ...rest }, ref) => {
-      const { currentThinkingId, setCurrentThinkingId } = useButtonGroup();
-      const { addRef, removeRef } = useButtonGroupRow();
-      const internalRef = useRef<HTMLButtonElement>(null);
+      const { currentThinkingId, setCurrentThinkingId } = useView();
 
       const hasID = thinkingId !== undefined;
       const handleClick = useCallbackStable<MouseEventHandler<HTMLButtonElement>>((e) => {
@@ -30,26 +28,10 @@ export const ButtonGroupButton = memo(
         return onClick?.(e);
       });
 
-      useEffect(() => {
-        addRef(internalRef);
-        return () => removeRef(internalRef);
-      }, [internalRef, addRef, removeRef]);
-
       return (
         <AsyncButton
           className={clsx("ButtonGroupButton", className, classes.root)}
-          ref={(el) => {
-            internalRef.current = el;
-            if (!ref) return;
-            switch (typeof ref) {
-              case "function":
-                ref(el);
-                break;
-              case "object":
-                ref.current = el;
-                break;
-            }
-          }}
+          ref={ref}
           onClick={handleClick}
           disabled={currentThinkingId !== undefined}
           forceThinking={hasID && thinkingId === currentThinkingId}

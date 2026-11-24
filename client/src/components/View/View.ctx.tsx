@@ -1,17 +1,21 @@
-import { useContext, useEffect } from "react";
+import { useEffect } from "react";
 import { createQuickCtx } from "../../utils/createQuickCtx.utils";
 
 export type ViewCtx = {
 	readonly viewReady: () => void;
+	readonly currentThinkingId: string | undefined;
+	readonly setCurrentThinkingId: (id: string) => void;
 };
 
-const [ctx, ViewProvider] = createQuickCtx<ViewCtx>("View", {
+const [, ViewProvider, useView] = createQuickCtx<ViewCtx>("View", {
 	viewReady: () => void 0,
-})(["viewReady"]);
+	currentThinkingId: undefined,
+	setCurrentThinkingId: () => void 0,
+})(["viewReady", "currentThinkingId", "setCurrentThinkingId"]);
 
-export { ViewProvider };
+export { useView, ViewProvider };
 
-export const useViewReady = () => useContext(ctx).viewReady;
+export const useViewReady = () => useView().viewReady;
 
 export const useViewReadyOnMount = () => {
 	const viewReady = useViewReady();

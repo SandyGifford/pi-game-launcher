@@ -3,6 +3,7 @@ import type { FC, ReactNode } from "react";
 import { memo, useRef, useState } from "react";
 import { CSSTransition, type TransitionStatus } from "react-transition-group";
 import { useCallbackStable } from "../../hooks/useCallbackStable.hook";
+import { useWindowHandler } from "../../hooks/useWindowHandler.hook";
 import { ViewProvider } from "./View.ctx";
 import classes from "./View.module.scss";
 
@@ -14,7 +15,9 @@ export type ViewProps = {
 export const View: FC<ViewProps> = memo(({ className, children, ...rest }) => {
 	const nodeRef = useRef<HTMLDivElement>(null);
 	const [isReady, setIsReady] = useState(false);
+	const [currentThinkingId, setCurrentThinkingId] = useState<string>();
 	const viewReady = useCallbackStable(() => setIsReady(true));
+	useWindowHandler(() => setCurrentThinkingId(undefined), [], "focus");
 
 	return (
 		<CSSTransition
@@ -32,7 +35,11 @@ export const View: FC<ViewProps> = memo(({ className, children, ...rest }) => {
 			{...rest}
 		>
 			{(status) => (
-				<ViewProvider viewReady={viewReady}>
+				<ViewProvider
+					viewReady={viewReady}
+					currentThinkingId={currentThinkingId}
+					setCurrentThinkingId={setCurrentThinkingId}
+				>
 					<div className={clsx("View", clsx(className, classes.root))} ref={nodeRef}>
 						{children(status)}
 					</div>
