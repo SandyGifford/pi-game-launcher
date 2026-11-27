@@ -8,20 +8,32 @@
   min-width: 100vw;
   min-height: 100vh;
 
-	&--enter {
+	&--opacity-enter {
 		opacity: 0;
+	}
+
+	&--opacity-enter-active,
+	&--opacity-enter-done,
+	&--opacity-exit {
+		opacity: 1;
+	}
+
+	&--opacity-exit-active,
+	&--opacity-exit-done {
+		opacity: 0;
+	}
+
+	&--transition-enter {
 		transform: translateX(-100%);
 	}
 
-	&--exit,
-	&--enter-done,
-	&--enter-active {
-		opacity: 1;
+	&--transition-exit,
+	&--transition-enter-done,
+	&--transition-enter-active {
 		transform: none;
 	}
-	&--exit-active,
-	&--exit-done {
-		opacity: 0;
+	&--transition-exit-active,
+	&--transition-exit-done {
 		transform: translateX(100%);
 	}
 }

@@ -1,9 +1,10 @@
 import clsx from "clsx";
 import type { FC, ReactNode } from "react";
-import { memo, useLayoutEffect, useRef, useState } from "react";
+import { memo, useRef, useState } from "react";
 import { CSSTransition, type TransitionStatus } from "react-transition-group";
 import { useCallbackStable } from "../../hooks/useCallbackStable.hook";
 import { useWindowHandler } from "../../hooks/useWindowHandler.hook";
+import { resolveNestedTransitionStatuses } from "../../utils/transition.utils";
 import type { InjectableTransitionProps } from "../ui/TransitionInjector/TransitionInjector";
 import { ViewProvider } from "./View.ctx";
 import classes from "./View.module.scss";
@@ -11,22 +12,6 @@ import classes from "./View.module.scss";
 export type ViewProps = InjectableTransitionProps & {
 	readonly className?: string;
 	readonly children: (transitionStatus: TransitionStatus) => ReactNode;
-};
-
-const ViewExitObserver: FC<{
-	readonly isPresent: boolean;
-	readonly status: TransitionStatus;
-	readonly onExited: (() => void) | undefined;
-}> = ({ isPresent, status, onExited }) => {
-	const wasPresent = useRef(isPresent);
-
-	useLayoutEffect(() => {
-		const removed = wasPresent.current && !isPresent;
-		wasPresent.current = isPresent;
-		if (removed && status === "exited") onExited?.();
-	}, [isPresent, status, onExited]);
-
-	return null;
 };
 
 export const View: FC<ViewProps> = memo(
@@ -42,34 +27,52 @@ export const View: FC<ViewProps> = memo(
 				nodeRef={nodeRef}
 				timeout={500}
 				classNames={{
-					enter: classes["root--enter"],
-					enterActive: classes["root--enter-active"],
-					enterDone: classes["root--enter-done"],
-					exit: classes["root--exit"],
-					exitActive: classes["root--exit-active"],
-					exitDone: classes["root--exit-done"],
+					enter: classes["root--transition-enter"],
+					enterActive: classes["root--transition-enter-active"],
+					enterDone: classes["root--transition-enter-done"],
+					exit: classes["root--transition-exit"],
+					exitActive: classes["root--transition-exit-active"],
+					exitDone: classes["root--transition-exit-done"],
 				}}
 				{...rest}
-				in={isPresent && isReady}
+				in={isPresent}
 				onExited={onExited}
 			>
-				{(status) => (
-					<ViewProvider
-						isReady={isReady && isPresent}
-						status={status}
-						markViewAsReady={markViewAsReady}
-						currentThinkingId={currentThinkingId}
-						setCurrentThinkingId={setCurrentThinkingId}
+				{(transitionStatus) => (
+					<CSSTransition
+						nodeRef={nodeRef}
+						timeout={500}
+						in={isPresent && isReady}
+						classNames={{
+							enter: classes["root--opacity-enter"],
+							enterActive: classes["root--opacity-enter-active"],
+							enterDone: classes["root--opacity-enter-done"],
+							exit: classes["root--opacity-exit"],
+							exitActive: classes["root--opacity-exit-active"],
+							exitDone: classes["root--opacity-exit-done"],
+						}}
 					>
-						<div
-							ref={nodeRef}
-							className={clsx("View", className, classes.root)}
-							inert={status !== "entered" || !isPresent}
-						>
-							<ViewExitObserver isPresent={isPresent} status={status} onExited={onExited} />
-							{children(status)}
-						</div>
-					</ViewProvider>
+						{(opacityStatus) => {
+							const status = resolveNestedTransitionStatuses(transitionStatus, opacityStatus);
+							return (
+								<ViewProvider
+									isReady={isReady && isPresent}
+									status={opacityStatus}
+									markViewAsReady={markViewAsReady}
+									currentThinkingId={currentThinkingId}
+									setCurrentThinkingId={setCurrentThinkingId}
+								>
+									<div
+										ref={nodeRef}
+										className={clsx("View", className, classes.root)}
+										inert={status !== "entered" || !isPresent}
+									>
+										{children(status)}
+									</div>
+								</ViewProvider>
+							);
+						}}
+					</CSSTransition>
 				)}
 			</CSSTransition>
 		);
