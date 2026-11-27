@@ -1,5 +1,6 @@
+import { ActionIcon } from "@mantine/core";
 import { awaitTime } from "@repo/shared";
-import { Button } from "@mantine/core";
+import { IconArrowBigRight } from "@tabler/icons-react";
 import clsx from "clsx";
 import type { FC } from "react";
 import { memo, useEffect, useState } from "react";
@@ -10,6 +11,7 @@ import { useInUse } from "../../hooks/useInUse.hook";
 import type { SetView, ViewName, ViewParameters } from "../../types/view.types";
 import { renderView } from "../../utils/view.utils";
 import { View } from "../View/View";
+
 import classes from "./App.module.scss";
 
 export type AppProps = {
@@ -48,13 +50,13 @@ export const App: FC<AppProps> = memo(({ className }) => {
 						}
 					</View>
 				</TransitionGroup>
-				<Button
+				<ActionIcon
 					className={clsx(classes.back, !isMainView && classes["back--show"])}
 					onClick={goBack}
 					inert={isMainView}
 				>
-					→
-				</Button>
+					<IconArrowBigRight />
+				</ActionIcon>
 			</div>
 		</AppContext>
 	);
