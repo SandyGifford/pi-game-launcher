@@ -34,14 +34,7 @@ export const WifiList: FC<WifiListProps> = memo(({ className }) => {
 					?.filter(({ hidden }) => !hidden)
 					.map(({ ssid, bssid, inUse, security, signal }) => (
 						<AnimatedListItem key={bssid}>
-							<Button
-								variant="subtle"
-								className={classes.network}
-								classNames={{
-									inner: classes.network__inner,
-									label: classes.network__label,
-								}}
-							>
+							<Button variant="subtle">
 								<div className={classes.inUse}>{inUse && "•"}</div>
 								<div className={classes.ssid}>{ssid}</div>
 								<div className={classes.security}>{security.length ? <IconLock size="small" stroke={1} /> : undefined}</div>

@@ -41,39 +41,6 @@
 	}
 }
 
-.network {
-	--button-interaction-scale: 1.1;
-
-	cursor: pointer;
-	display: flex;
-	gap: fn.spacing();
-	align-items: center;
-	width: 100%;
-	height: auto;
-	min-height: 0;
-	box-sizing: border-box;
-	transition: fn.transition(scale, background-color);
-	user-select: none;
-	padding: fn.spacing(0.5, 3, 0.5, 1);
-	border-radius: fn.radius();
-	font: inherit;
-	text-align: left;
-	color: inherit;
-
-	&:focus,
-	&:hover {
-		background: var(--mantine-color-surface-6);
-	}
-}
-
-.network__inner,
-.network__label {
-	display: flex;
-	align-items: center;
-	gap: fn.spacing();
-	width: 100%;
-}
-
 .inUse {
 	flex: 0 0 20px;
 	text-align: center;
