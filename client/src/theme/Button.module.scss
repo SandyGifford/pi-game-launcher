@@ -1,4 +1,20 @@
 @use "../fn.scss";
+@use "../mi.scss";
+
+@include mi.theme-property(--button-bg-dark) {
+	syntax: "<color>";
+	initial-value: black;
+}
+
+@include mi.theme-property(--button--background-rotate) {
+	syntax: "<angle>";
+	initial-value: -10deg;
+}
+
+@include mi.theme-property(--button--background-inset) {
+	syntax: "<percentage>";
+	initial-value: 30%;
+}
 
 .root {
 	outline: none;
