@@ -12,6 +12,7 @@ const button = Button.extend({
 		component: ButtonRoot,
 		variant: "filled",
 		size: "md",
+		color: "dark",
 	},
 	vars: (_theme, props) => ({
 		root:
