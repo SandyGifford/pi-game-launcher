@@ -42,6 +42,8 @@
 }
 
 .network {
+	--button-interaction-scale: 1.1;
+
 	cursor: pointer;
 	display: flex;
 	gap: fn.spacing();
@@ -50,7 +52,7 @@
 	height: auto;
 	min-height: 0;
 	box-sizing: border-box;
-	transition: fn.transition(transform, background-color);
+	transition: fn.transition(scale, background-color);
 	user-select: none;
 	padding: fn.spacing(0.5, 3, 0.5, 1);
 	border-radius: fn.radius();
@@ -60,7 +62,6 @@
 
 	&:focus,
 	&:hover {
-		transform: scale(1.1);
 		background: var(--mantine-color-surface-6);
 	}
 }

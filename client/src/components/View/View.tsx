@@ -56,8 +56,6 @@ export const View: FC<ViewProps> = memo(
 							const status = resolveNestedTransitionStatuses(transitionStatus, opacityStatus);
 							return (
 								<ViewProvider
-									isReady={isReady && isPresent}
-									status={opacityStatus}
 									markViewAsReady={markViewAsReady}
 									currentThinkingId={currentThinkingId}
 									setCurrentThinkingId={setCurrentThinkingId}

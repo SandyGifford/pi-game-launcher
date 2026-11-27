@@ -83,12 +83,12 @@
 	position: absolute;
 	top: fn.spacing();
 	right: 0;
-	transition: fn.transition(transform, opacity);
-	transform: translateX(100%);
+	transition: fn.transition(translate, opacity, scale);
+	translate: 100% 0;
 	opacity: 0;
 
 	&--show {
-		transform: translateX(fn.spacing(-1));
+		translate: fn.spacing(-1) 0;
 		opacity: 1;
 	}
 }

@@ -1,11 +1,13 @@
 import { Button, createTheme, Loader, type MantineColorsTuple } from "@mantine/core";
 import { ButtonRoot } from "../components/ui/ButtonRoot/ButtonRoot";
 import { CustomLoader } from "../components/ui/CustomLoader/CustomLoader";
+import buttonClasses from "./Button.module.scss";
 
 const buttonBackground =
 	"linear-gradient(var(--button--background-rotate), var(--button--background-light) var(--button--background-inset), var(--button--background-dark) 100%)";
 
 const button = Button.extend({
+	classNames: { root: buttonClasses.root },
 	defaultProps: {
 		component: ButtonRoot,
 		variant: "filled",

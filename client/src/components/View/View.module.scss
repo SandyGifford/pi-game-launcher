@@ -1,39 +1,43 @@
 @use "../../fn.scss";
 
 .root {
-	transition: fn.transition(opacity, transform);
+	transition: fn.transition(opacity, translate, scale);
 	opacity: 0;
-	transform: none;
+	translate: none;
+	scale: 2;
   position: absolute;
   min-width: 100vw;
   min-height: 100vh;
 
 	&--opacity-enter {
 		opacity: 0;
+		scale: 2;
 	}
 
 	&--opacity-enter-active,
 	&--opacity-enter-done,
 	&--opacity-exit {
 		opacity: 1;
+		scale: 1;
 	}
 
 	&--opacity-exit-active,
 	&--opacity-exit-done {
 		opacity: 0;
+		scale: 2;
 	}
 
 	&--transition-enter {
-		transform: translateX(-100%);
+		translate: -100% 0;
 	}
 
 	&--transition-exit,
 	&--transition-enter-done,
 	&--transition-enter-active {
-		transform: none;
+		translate: none;
 	}
 	&--transition-exit-active,
 	&--transition-exit-done {
-		transform: translateX(100%);
+		translate: 100% 0;
 	}
 }

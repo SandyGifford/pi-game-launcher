@@ -1,0 +1,17 @@
+@use "../fn.scss";
+
+:where(.root) {
+	transition: fn.transition(scale);
+}
+
+:where(.root):focus:where(:not([data-loading], :disabled, [data-disabled])) {
+	background-color: var(--button-hover, var(--mantine-primary-color-filled-hover));
+	color: var(--button-hover-color, var(--button-color));
+}
+
+.root:not(:disabled):not([data-disabled]) {
+	&:hover,
+	&:focus {
+		scale: var(--button-interaction-scale, 1.15);
+	}
+}

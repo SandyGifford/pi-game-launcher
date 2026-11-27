@@ -2,12 +2,14 @@
 
 .root {
 	width: max-content;
-	transition: fn.transition(transform, border-width);
+	transition: fn.transition(scale, border-width);
 
-	&:focus {
-		outline: none;
-		transform: scale(1.15);
-		border-width: 3px;
-		z-index: 1;
+	&:not(:disabled):not([data-disabled]) {
+		&:hover,
+		&:focus {
+			outline: none;
+			border-width: 3px;
+			z-index: 1;
+		}
 	}
 }

@@ -1,5 +1,4 @@
 import { createContext, memo, useContext, useEffect, type ReactNode } from "react";
-import type { TransitionStatus } from "react-transition-group";
 import { createQuickCtx } from "../../utils/createQuickCtx.utils";
 
 type ViewThinkingCtx = {
@@ -26,23 +25,13 @@ export const useViewReadyOnMount = () => {
 	}, []);
 };
 
-const viewIsReadyCtx = createContext<boolean>(true);
-const viewReadyTransitionCtx = createContext<TransitionStatus>("entered");
-
-export const useViewIsReady = () => useContext(viewIsReadyCtx);
-export const useViewReadyTransitionStatus = () => useContext(viewReadyTransitionCtx);
-
 export const ViewProvider = memo(
 	({
-		isReady,
-		status,
 		markViewAsReady,
 		currentThinkingId,
 		setCurrentThinkingId,
 		children,
 	}: {
-		readonly isReady: boolean;
-		readonly status: TransitionStatus;
 		readonly markViewAsReady: () => void;
 		readonly currentThinkingId: string | undefined;
 		readonly setCurrentThinkingId: (id: string) => void;
@@ -53,11 +42,7 @@ export const ViewProvider = memo(
 			setCurrentThinkingId={setCurrentThinkingId}
 		>
 			<viewMarkReadyCtx.Provider value={markViewAsReady}>
-				<viewIsReadyCtx.Provider value={isReady}>
-					<viewReadyTransitionCtx.Provider value={status}>
-						{children}
-					</viewReadyTransitionCtx.Provider>
-				</viewIsReadyCtx.Provider>
+				{children}
 			</viewMarkReadyCtx.Provider>
 		</ViewThinkingProvider>
 	)

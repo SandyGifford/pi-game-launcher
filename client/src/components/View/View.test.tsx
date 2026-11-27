@@ -4,8 +4,6 @@ import { View } from "./View";
 import {
 	ViewProvider,
 	useMarkViewAsReady,
-	useViewIsReady,
-	useViewReadyTransitionStatus,
 	useViewThinking,
 } from "./View.ctx";
 
@@ -22,12 +20,7 @@ it("provides readiness and thinking values together", () => {
 	const setCurrentThinkingId = vi.fn();
 	const readContexts = vi.fn();
 	const Consumer = () => {
-		readContexts(
-			useMarkViewAsReady(),
-			useViewThinking(),
-			useViewIsReady(),
-			useViewReadyTransitionStatus()
-		);
+		readContexts(useMarkViewAsReady(), useViewThinking());
 		return null;
 	};
 
@@ -36,8 +29,6 @@ it("provides readiness and thinking values together", () => {
 			markViewAsReady={markViewAsReady}
 			currentThinkingId="launch"
 			setCurrentThinkingId={setCurrentThinkingId}
-			isReady
-			status="entering"
 		>
 			<Consumer />
 		</ViewProvider>
@@ -45,8 +36,6 @@ it("provides readiness and thinking values together", () => {
 
 	expect(readContexts).toHaveBeenCalledWith(
 		markViewAsReady,
-		{ currentThinkingId: "launch", setCurrentThinkingId },
-		true,
-		"entering"
+		{ currentThinkingId: "launch", setCurrentThinkingId }
 	);
 });
