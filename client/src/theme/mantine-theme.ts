@@ -1,13 +1,13 @@
 import { Button, createTheme, Loader, type MantineColorsTuple } from "@mantine/core";
+import clsx from "clsx";
 import { ButtonRoot } from "../components/ui/ButtonRoot/ButtonRoot";
 import { CustomLoader } from "../components/ui/CustomLoader/CustomLoader";
 import buttonClasses from "./Button.module.scss";
 
-const buttonBackground =
-	"linear-gradient(var(--button--background-rotate), var(--button--background-light) var(--button--background-inset), var(--button--background-dark) 100%)";
-
 const button = Button.extend({
-	classNames: { root: buttonClasses.root },
+	classNames: (_theme, props) => ({
+		root: clsx(buttonClasses.root, props.disabled && buttonClasses.disabled),
+	}),
 	defaultProps: {
 		component: ButtonRoot,
 		variant: "filled",
@@ -22,32 +22,9 @@ const button = Button.extend({
 						"--button-padding-x": "calc(var(--mantine-spacing-sm) * 2)",
 						"--button-fz": "1rem",
 						"--button-radius": "var(--mantine-radius-default)",
-						"--button-bg": buttonBackground,
 						"--button-color": "var(--mantine-color-white)",
 						"--button-bd": "1px outset var(--mantine-color-surface-0)",
 					},
-	}),
-	styles: (_theme, props) => ({
-		root: {
-			outline: "none",
-			...(props.variant === "subtle"
-				? {}
-				: {
-						fontFamily: "inherit",
-						minHeight: 48,
-						fontWeight: "bold",
-						cursor: "pointer",
-						boxShadow:
-							"inset 0 0 var(--mantine-spacing-sm) var(--mantine-spacing-sm) var(--button--background-dark)",
-					}),
-			...(props.disabled
-				? {
-						opacity: 0.75,
-						cursor: "default",
-						...(props.variant === "subtle" ? {} : { background: "var(--button-bg)" }),
-					}
-				: {}),
-		},
 	}),
 });
 

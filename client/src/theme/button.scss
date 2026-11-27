@@ -1,19 +1,8 @@
 @use "../mi.scss";
 
-@include mi.theme-property(
-	--button--background-light,
-	#{alpha }(from var(--mantine-color-control-3) / 0.5)
-) {
+@include mi.theme-property(--button-bg-dark) {
 	syntax: "<color>";
-	initial-value: rgb(80, 80, 106, 0.5);
-}
-
-@include mi.theme-property(
-	--button--background-dark,
-	#{alpha }(from var(--mantine-color-control-5) / 0.75)
-) {
-	syntax: "<color>";
-	initial-value: rgb(80, 80, 106, 0.5);
+	initial-value: black;
 }
 
 @include mi.theme-property(--button--background-rotate) {

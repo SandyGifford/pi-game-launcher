@@ -11,11 +11,11 @@
 	@keyframes thinking-inset {
 		from {
 			--button--background-inset: 30%;
-			--button--background-dark: var(--mantine-color-control-5);
+			--button-bg-dark: color-mix(in srgb, var(--button-bg) 80%, black);
 		}
 		to {
 			--button--background-inset: 0%;
-			--button--background-dark: var(--mantine-color-control-9);
+			--button-bg-dark: color-mix(in srgb, var(--button-bg) 25%, black);
 		}
 	}
 
