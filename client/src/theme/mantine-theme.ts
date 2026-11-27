@@ -23,7 +23,7 @@ const button = Button.extend({
 						"--button-fz": "1rem",
 						"--button-radius": "var(--mantine-radius-default)",
 						"--button-color": "var(--mantine-color-white)",
-						"--button-bd": "1px outset var(--mantine-color-surface-0)",
+						"--button-bd": "1px outset var(--button-bg)",
 					},
 	}),
 });

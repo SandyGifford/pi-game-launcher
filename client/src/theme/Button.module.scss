@@ -44,7 +44,7 @@
 	}
 
 	:where(&) {
-		transition: fn.transition(scale);
+		transition: fn.transition(scale, border-width);
 
 		&:focus:where(:not([data-loading], :disabled, [data-disabled])) {
 			background-color: var(--button-hover, var(--mantine-primary-color-filled-hover));
@@ -55,6 +55,8 @@
 			&:hover,
 			&:focus {
 				scale: var(--button-interaction-scale, 1.15);
+				border-width: 3px;
+				z-index: 1;
 			}
 		}
 	}

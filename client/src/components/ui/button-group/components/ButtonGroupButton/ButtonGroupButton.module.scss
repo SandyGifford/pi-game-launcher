@@ -1,15 +1,3 @@
-@use "../../../../../fn.scss";
-
 .root {
 	width: max-content;
-	transition: fn.transition(scale, border-width);
-
-	&:not(:disabled):not([data-disabled]) {
-		&:hover,
-		&:focus {
-			outline: none;
-			border-width: 3px;
-			z-index: 1;
-		}
-	}
 }

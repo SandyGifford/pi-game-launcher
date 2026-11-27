@@ -83,7 +83,7 @@
 	position: absolute;
 	top: fn.spacing();
 	right: 0;
-	transition: fn.transition(translate, opacity, scale);
+	transition: fn.transition(translate, opacity, scale, border-width);
 	translate: 100% 0;
 	opacity: 0;
 
