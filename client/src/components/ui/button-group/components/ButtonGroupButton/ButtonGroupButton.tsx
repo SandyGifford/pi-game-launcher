@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { forwardRef, memo, type MouseEventHandler } from "react";
 import type { OverrideProperties } from "type-fest";
 import { useCallbackStable } from "../../../../../hooks/useCallbackStable.hook";
-import { useView } from "../../../../View/View.ctx";
+import { useViewThinking } from "../../../../View/View.ctx";
 import classes from "./ButtonGroupButton.module.scss";
 import { AsyncButton, type AsyncButtonProps } from "../../../AsyncButton/AsyncButton";
 
@@ -20,7 +20,7 @@ export type ButtonGroupButtonProps = OverrideProperties<
 export const ButtonGroupButton = memo(
   forwardRef<HTMLButtonElement, ButtonGroupButtonProps>(
     ({ className, hidden, children, onClick, thinkingId, ...rest }, ref) => {
-      const { currentThinkingId, setCurrentThinkingId } = useView();
+      const { currentThinkingId, setCurrentThinkingId } = useViewThinking();
 
       const hasID = thinkingId !== undefined;
       const handleClick = useCallbackStable<MouseEventHandler<HTMLButtonElement>>((e) => {

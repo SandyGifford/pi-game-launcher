@@ -1,0 +1,32 @@
+@keyframes enter {
+	from {
+		scale: 2;
+	}
+	to {
+		scale: 1;
+	}
+}
+
+@keyframes exit {
+	from {
+		scale: 1;
+	}
+	to {
+		scale: 2;
+	}
+}
+
+.root {
+	&--entering,
+	&--exiting {
+		transform-origin: var(--ButtonRoot-transform-origin-x) var(--ButtonRoot-transform-origin-y);
+	}
+
+	&--entering {
+		animation: enter 500ms ease;
+	}
+
+	&--exiting {
+		animation: exit 500ms ease;
+	}
+}

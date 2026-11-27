@@ -2,7 +2,7 @@
 
 .root {
 	transition: fn.transition(opacity, transform);
-	opacity: 1;
+	opacity: 0;
 	transform: none;
   position: absolute;
   min-width: 100vw;

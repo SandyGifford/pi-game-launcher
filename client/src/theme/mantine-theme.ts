@@ -1,4 +1,5 @@
 import { Button, createTheme, Loader, type MantineColorsTuple } from "@mantine/core";
+import { ButtonRoot } from "../components/ui/ButtonRoot/ButtonRoot";
 import { CustomLoader } from "../components/ui/CustomLoader/CustomLoader";
 
 const buttonBackground =
@@ -6,6 +7,7 @@ const buttonBackground =
 
 const button = Button.extend({
 	defaultProps: {
+		component: ButtonRoot,
 		variant: "filled",
 		size: "md",
 	},
