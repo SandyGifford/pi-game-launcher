@@ -1,3 +1,5 @@
+import { ActionIcon } from "@mantine/core";
+import { IconArrowBigRight } from "@tabler/icons-react";
 import clsx from "clsx";
 import type { FC, ReactNode } from "react";
 import { memo, useRef, useState } from "react";
@@ -16,17 +18,22 @@ import { moveFocus, type Vec2 } from "../../utils/move-focus.utils";
 export type ViewProps = InjectableTransitionProps & {
 	readonly className?: string;
 	readonly children: (transitionStatus: TransitionStatus) => ReactNode;
+	readonly onBack?: () => void;
 };
 
 export const View: FC<ViewProps> = memo(
-	({ className, children, in: isPresent = true, onExited, ...rest }) => {
+	({ className, children, onBack, in: isPresent = true, onExited, ...rest }) => {
 		const nodeRef = useRef<HTMLDivElement>(null);
 		const [isReady, setIsReady] = useState(false);
 		const [currentThinkingId, setCurrentThinkingId] = useState<string>();
 		const markViewAsReady = useCallbackStable(() => setIsReady(true));
 		useWindowHandler(() => setCurrentThinkingId(undefined), [], "focus");
 
-		const move = useCallbackStable((vec: Vec2) => moveFocus(vec, nodeRef.current || undefined));
+		const move = useCallbackStable((vec: Vec2) => {
+			const node = nodeRef.current;
+			if (!isPresent || !node || node.inert) return;
+			moveFocus(vec, node);
+		});
 		useEventDispatcher(allGamepadDirection, move);
 		useKeysDown(
 			({ ArrowUp, ArrowDown, ArrowLeft, ArrowRight }) =>
@@ -81,6 +88,11 @@ export const View: FC<ViewProps> = memo(
 										inert={status !== "entered" || !isPresent}
 									>
 										{children(status)}
+										{onBack && (
+											<ActionIcon className={classes.back} aria-label="Back" onClick={onBack}>
+												<IconArrowBigRight />
+											</ActionIcon>
+										)}
 									</div>
 								</ViewProvider>
 							);

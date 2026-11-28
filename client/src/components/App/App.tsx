@@ -1,6 +1,4 @@
-import { ActionIcon } from "@mantine/core";
 import { awaitTime } from "@repo/shared";
-import { IconArrowBigRight } from "@tabler/icons-react";
 import clsx from "clsx";
 import type { FC } from "react";
 import { memo, useEffect, useState } from "react";
@@ -44,19 +42,12 @@ export const App: FC<AppProps> = memo(({ className }) => {
 		<AppContext thinkWhile={thinkWhile} setView={setView}>
 			<div className={clsx("App", className, classes.root, thinking && classes["root--thinking"])}>
 				<TransitionGroup>
-					<View key={viewState.view}>
+					<View key={viewState.view} onBack={isMainView ? undefined : goBack}>
 						{(transitionStatus) =>
 							renderView(viewState.view, { transitionStatus }, ...viewState.args)
 						}
 					</View>
 				</TransitionGroup>
-				<ActionIcon
-					className={clsx(classes.back, !isMainView && classes["back--show"])}
-					onClick={goBack}
-					inert={isMainView}
-				>
-					<IconArrowBigRight />
-				</ActionIcon>
 			</div>
 		</AppContext>
 	);

@@ -14,6 +14,17 @@
 		scale: 2;
 	}
 
+	.back {
+		position: absolute;
+		top: fn.spacing();
+		right: fn.spacing();
+
+		&:focus {
+			outline: 2px solid var(--mantine-color-text);
+			outline-offset: 2px;
+		}
+	}
+
 	&--opacity-enter-active,
 	&--opacity-enter-done,
 	&--opacity-exit {
