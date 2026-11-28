@@ -36,35 +36,34 @@ const _moveFocus = (
 		let bestEl: HTMLButtonElement | undefined;
 
 		const dir = direction / Math.abs(direction);
-		const initCapStart = fromRect?.[crossStartProp] ?? viewRect[crossStartProp];
-		const initCapEnd = fromRect?.[crossEndProp] ?? viewRect[crossEndProp];
-		const initStart =
-			direction > 0
-				? (fromRect?.[axisEndProp] ?? viewRect[axisStartProp])
-				: (fromRect?.[axisStartProp] ?? viewRect[axisEndProp]);
-		let bestStart = initStart;
-		let bestOverlaps = false;
+		const initCrossStart = fromRect?.[crossStartProp] ?? viewRect[crossStartProp];
+		const initCrossEnd = fromRect?.[crossEndProp] ?? viewRect[crossEndProp];
+		const initAxisPosition = fromRect
+			? (fromRect[axisStartProp] + fromRect[axisEndProp]) / 2
+			: viewRect[direction > 0 ? axisStartProp : axisEndProp];
+		let bestAxisPosition = 0;
+		let bestCrossOverlaps = false;
 
 		btns.forEach((btn) => {
-			if (!(btn instanceof HTMLButtonElement)) return;
+			if (!(btn instanceof HTMLButtonElement) || btn === active) return;
 
 			const rect = getRect(btn);
 
-			const capStart = rect[crossStartProp];
-			const capEnd = rect[crossEndProp];
-			const start = direction > 0 ? rect[axisStartProp] : rect[axisEndProp];
-			const overlaps = !(capEnd <= initCapStart) && !(capStart >= initCapEnd);
+			const crossStart = rect[crossStartProp];
+			const crossEnd = rect[crossEndProp];
+			const axisPosition = (rect[axisStartProp] + rect[axisEndProp]) / 2;
+			const crossOverlaps = !(crossEnd <= initCrossStart) && !(crossStart >= initCrossEnd);
 
-			if (start * dir < initStart * dir) return;
+			if (axisPosition * dir <= initAxisPosition * dir) return;
 
 			if (
 				!bestEl ||
-				(overlaps && !bestOverlaps) ||
-				(overlaps === bestOverlaps && start * dir < bestStart * dir)
+				(crossOverlaps && !bestCrossOverlaps) ||
+				(crossOverlaps === bestCrossOverlaps && axisPosition * dir < bestAxisPosition * dir)
 			) {
 				bestEl = btn;
-				bestStart = start;
-				bestOverlaps = overlaps;
+				bestAxisPosition = axisPosition;
+				bestCrossOverlaps = crossOverlaps;
 			}
 		});
 
