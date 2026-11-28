@@ -1,9 +1,9 @@
 import { Modal, TextInput, type TextInputProps } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
+import { useCallbackRef } from "@mantine/hooks";
 import clsx from "clsx";
-import type { ReactElement, Ref } from "react";
+import type { ChangeEventHandler, ReactElement, Ref } from "react";
 import { forwardRef, memo, useState } from "react";
-import { AutoRefTransition } from "../ui/AutoRefTransition/AutoRefTransition";
+import { useCallbackStable } from "../../hooks/useCallbackStable.hook";
 import classes from "./TextEntry.module.scss";
 
 export type TextEntryCompleteHandler = (value: string) => unknown;
@@ -13,67 +13,53 @@ export type TextEntryChild = ReactElement<{ readonly ref?: Ref<HTMLElement> }>;
 export type TextEntryProps = {
 	readonly className?: string;
 	readonly defaultValue?: string;
-	readonly onClose?: () => unknown;
-	readonly onComplete?: TextEntryCompleteHandler;
-	readonly children?:
-		| TextEntryChild
-		| ((args: { readonly open: () => void; readonly close: () => void }) => TextEntryChild);
-} & Omit<TextInputProps, "children" | "value" | "defaultValue">;
-
-const DURATION_MS = 500;
+	readonly opened?: boolean;
+	readonly onClose?: (value: string) => unknown;
+	readonly onSubmit?: (value: string) => unknown;
+	readonly onCancel?: () => unknown;
+} & Omit<TextInputProps, "children" | "value" | "defaultValue" | "onSubmit">;
 
 export const TextEntry = memo(
-	forwardRef<HTMLElement, TextEntryProps>(
+	forwardRef<HTMLInputElement, TextEntryProps>(
 		(
 			{
 				className,
 				style,
 				defaultValue = "",
-				onChange,
 				onKeyDown,
 				onClose,
-				onComplete,
-				children,
+				onCancel,
+				onSubmit,
+				onChange,
+				opened,
 				...rest
 			},
 			extRef
 		) => {
-			const [opened, { close }] = useDisclosure(false);
-			const [value] = useState(defaultValue);
+			const [value, setValue] = useState(defaultValue);
+
+			const handleCancel = useCallbackStable(() => {
+				onClose?.(defaultValue);
+				onCancel?.();
+			});
+
+			const handleChange = useCallbackRef<ChangeEventHandler<HTMLInputElement>>((e) => {
+				setValue(e.target.value);
+				onChange?.(e);
+			});
 
 			return (
 				<>
-					<Modal
-						opened={opened}
-						onClose={close}
-						title="Text entry"
-						withCloseButton={false}
-						classNames={{
-							inner: classes.modalInner,
-							content: classes.modalContent,
-							header: classes.modalHeader,
-							body: classes.modalBody,
-						}}
-						transitionProps={{
-							duration: DURATION_MS,
-							transition: {
-								in: { opacity: 1 },
-								out: { opacity: 1 },
-								transitionProperty: "opacity",
-							},
-						}}
-					>
-						<AutoRefTransition in={opened} appear mountOnEnter timeout={DURATION_MS}>
-							{(state) => (
-								<TextInput
-									aria-label={rest.label ? undefined : "Text entry"}
-									data-autofocus
-									{...rest}
-									className={clsx("TextEntry", className, classes.root, classes[`root--${state}`])}
-									value={value}
-								/>
-							)}
-						</AutoRefTransition>
+					<Modal opened={!!opened} onClose={handleCancel}>
+						<TextInput
+							ref={extRef}
+							size="xl"
+							className={clsx("TextEntry", className, classes.root)}
+							data-autofocus
+							onChange={handleChange}
+							value={value}
+							{...rest}
+						/>
 					</Modal>
 				</>
 			);
