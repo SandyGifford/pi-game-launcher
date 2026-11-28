@@ -1,5 +1,7 @@
 export type Vec2 = { readonly x: number; readonly y: number };
 
+const AXIS_DEADZONE = 5;
+
 const _moveFocus = (
 	{ x, y }: Vec2,
 	cached: Map<HTMLElement, DOMRect>,
@@ -42,9 +44,9 @@ const _moveFocus = (
 		const initAxisPosition = fromRect
 			? (fromRect[axisStartProp] + fromRect[axisEndProp]) / 2
 			: viewRect[direction > 0 ? axisStartProp : axisEndProp];
-		let bestAxisPosition = 0;
-		let bestCrossOverlaps = false;
+		let bestAxisDist = 0;
 		let bestCrossDist = 0;
+		let bestCrossOverlaps = false;
 
 		btns.forEach((btn) => {
 			if (!(btn instanceof HTMLButtonElement) || btn === active) return;
@@ -54,26 +56,25 @@ const _moveFocus = (
 			const crossStart = rect[crossStartProp];
 			const crossEnd = rect[crossEndProp];
 			const crossCenter = (crossStart + crossEnd) / 2;
-			const axisPosition = (rect[axisStartProp] + rect[axisEndProp]) / 2;
 			const crossOverlaps = !(crossEnd <= initCrossStart) && !(crossStart >= initCrossEnd);
-
+			const axisPosition = (rect[axisStartProp] + rect[axisEndProp]) / 2;
 			const axisDist = Math.abs(axisPosition - initAxisPosition);
 			const crossDist = Math.abs(crossCenter - initCrossCenter);
 
 			if (axisPosition * dir <= initAxisPosition * dir) return;
-			if (fromRect && crossDist > axisDist) return;
+			if (fromRect && !crossOverlaps && axisDist <= AXIS_DEADZONE) return;
 
 			if (
 				!bestEl ||
 				(crossOverlaps && !bestCrossOverlaps) ||
 				(crossOverlaps === bestCrossOverlaps &&
-					(axisPosition * dir < bestAxisPosition * dir ||
-						(axisPosition === bestAxisPosition && crossDist < bestCrossDist)))
+					(axisDist < bestAxisDist ||
+						(axisDist === bestAxisDist && crossDist < bestCrossDist)))
 			) {
 				bestEl = btn;
-				bestAxisPosition = axisPosition;
-				bestCrossOverlaps = crossOverlaps;
+				bestAxisDist = axisDist;
 				bestCrossDist = crossDist;
+				bestCrossOverlaps = crossOverlaps;
 			}
 		});
 

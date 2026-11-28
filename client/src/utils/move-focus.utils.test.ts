@@ -62,7 +62,7 @@ it.each([
 	}
 );
 
-it("rejects buttons whose centers are behind, and prefers aligned candidates over closer fallbacks", () => {
+it("rejects buttons whose centers are behind and prefers aligned candidates over closer fallbacks", () => {
 	const { buttons, container, documentState } = setup(
 		[
 			{ left: 0, right: 100, top: -80, bottom: -10 },
@@ -108,9 +108,9 @@ it("chooses the nearest non-aligned candidate when no aligned candidate exists",
 });
 
 it.each([
-	{ direction: { x: 0, y: 1 }, sideways: { left: 110, right: 210, top: 1, bottom: 101 } },
-	{ direction: { x: 1, y: 0 }, sideways: { left: 1, right: 101, top: 110, bottom: 210 } },
-])("ignores candidates that are more sideways than forward: $direction", ({ direction, sideways }) => {
+	{ direction: { x: 0, y: 1 }, sideways: { left: 110, right: 210, top: 5, bottom: 105 } },
+	{ direction: { x: 1, y: 0 }, sideways: { left: 5, right: 105, top: 110, bottom: 210 } },
+])("ignores candidates within the axis deadzone: $direction", ({ direction, sideways }) => {
 	const { buttons, container, documentState } = setup(
 		[sideways, { left: 0, right: 100, top: 0, bottom: 100 }],
 		1
@@ -121,10 +121,24 @@ it.each([
 	expect(documentState.activeElement).toBe(buttons[1]);
 });
 
-it("allows a candidate equally far sideways and forward", () => {
+it("allows a far sideways candidate just beyond the axis deadzone", () => {
 	const { buttons, container, documentState } = setup(
 		[
-			{ left: 100, right: 200, top: 100, bottom: 200 },
+			{ left: 300, right: 400, top: 6, bottom: 106 },
+			{ left: 0, right: 100, top: 0, bottom: 100 },
+		],
+		1
+	);
+
+	moveFocus({ x: 0, y: 1 }, container);
+
+	expect(documentState.activeElement).toBe(buttons[0]);
+});
+
+it("does not apply the fallback deadzone to cross-axis overlapping candidates", () => {
+	const { buttons, container, documentState } = setup(
+		[
+			{ left: 0, right: 100, top: 5, bottom: 105 },
 			{ left: 0, right: 100, top: 0, bottom: 100 },
 		],
 		1
@@ -214,3 +228,12 @@ it.each([
 	}
 );
 
+it("does not apply the deadzone when no button is focused", () => {
+	const { buttons, container, documentState } = setup([
+		{ left: 10, right: 30, top: 0, bottom: 4 },
+	]);
+
+	moveFocus({ x: 0, y: 1 }, container);
+
+	expect(documentState.activeElement).toBe(buttons[0]);
+});
