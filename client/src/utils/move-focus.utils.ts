@@ -38,11 +38,13 @@ const _moveFocus = (
 		const dir = direction / Math.abs(direction);
 		const initCrossStart = fromRect?.[crossStartProp] ?? viewRect[crossStartProp];
 		const initCrossEnd = fromRect?.[crossEndProp] ?? viewRect[crossEndProp];
+		const initCrossCenter = (initCrossStart + initCrossEnd) / 2;
 		const initAxisPosition = fromRect
 			? (fromRect[axisStartProp] + fromRect[axisEndProp]) / 2
 			: viewRect[direction > 0 ? axisStartProp : axisEndProp];
 		let bestAxisPosition = 0;
 		let bestCrossOverlaps = false;
+		let bestCrossDist = 0;
 
 		btns.forEach((btn) => {
 			if (!(btn instanceof HTMLButtonElement) || btn === active) return;
@@ -51,19 +53,27 @@ const _moveFocus = (
 
 			const crossStart = rect[crossStartProp];
 			const crossEnd = rect[crossEndProp];
+			const crossCenter = (crossStart + crossEnd) / 2;
 			const axisPosition = (rect[axisStartProp] + rect[axisEndProp]) / 2;
 			const crossOverlaps = !(crossEnd <= initCrossStart) && !(crossStart >= initCrossEnd);
 
+			const axisDist = Math.abs(axisPosition - initAxisPosition);
+			const crossDist = Math.abs(crossCenter - initCrossCenter);
+
 			if (axisPosition * dir <= initAxisPosition * dir) return;
+			if (fromRect && crossDist > axisDist) return;
 
 			if (
 				!bestEl ||
 				(crossOverlaps && !bestCrossOverlaps) ||
-				(crossOverlaps === bestCrossOverlaps && axisPosition * dir < bestAxisPosition * dir)
+				(crossOverlaps === bestCrossOverlaps &&
+					(axisPosition * dir < bestAxisPosition * dir ||
+						(axisPosition === bestAxisPosition && crossDist < bestCrossDist)))
 			) {
 				bestEl = btn;
 				bestAxisPosition = axisPosition;
 				bestCrossOverlaps = crossOverlaps;
+				bestCrossDist = crossDist;
 			}
 		});
 

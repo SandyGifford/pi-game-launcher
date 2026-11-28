@@ -66,8 +66,8 @@ it("rejects buttons whose centers are behind, and prefers aligned candidates ove
 	const { buttons, container, documentState } = setup(
 		[
 			{ left: 0, right: 100, top: -80, bottom: -10 },
-			{ left: 120, right: 160, top: 105, bottom: 125 },
-			{ left: 0, right: 100, top: 150, bottom: 170 },
+			{ left: 120, right: 160, top: 150, bottom: 170 },
+			{ left: 0, right: 100, top: 200, bottom: 220 },
 			{ left: 0, right: 100, top: 0, bottom: 100 },
 		],
 		3
@@ -96,7 +96,7 @@ it("chooses the nearest non-aligned candidate when no aligned candidate exists",
 	const { buttons, container, documentState } = setup(
 		[
 			{ left: 120, right: 160, top: 200, bottom: 220 },
-			{ left: 120, right: 160, top: 110, bottom: 130 },
+			{ left: 120, right: 160, top: 150, bottom: 170 },
 			{ left: 0, right: 100, top: 0, bottom: 100 },
 		],
 		2
@@ -105,6 +105,34 @@ it("chooses the nearest non-aligned candidate when no aligned candidate exists",
 	moveFocus({ x: 0, y: 1 }, container);
 
 	expect(documentState.activeElement).toBe(buttons[1]);
+});
+
+it.each([
+	{ direction: { x: 0, y: 1 }, sideways: { left: 110, right: 210, top: 1, bottom: 101 } },
+	{ direction: { x: 1, y: 0 }, sideways: { left: 1, right: 101, top: 110, bottom: 210 } },
+])("ignores candidates that are more sideways than forward: $direction", ({ direction, sideways }) => {
+	const { buttons, container, documentState } = setup(
+		[sideways, { left: 0, right: 100, top: 0, bottom: 100 }],
+		1
+	);
+
+	moveFocus(direction, container);
+
+	expect(documentState.activeElement).toBe(buttons[1]);
+});
+
+it("allows a candidate equally far sideways and forward", () => {
+	const { buttons, container, documentState } = setup(
+		[
+			{ left: 100, right: 200, top: 100, bottom: 200 },
+			{ left: 0, right: 100, top: 0, bottom: 100 },
+		],
+		1
+	);
+
+	moveFocus({ x: 0, y: 1 }, container);
+
+	expect(documentState.activeElement).toBe(buttons[0]);
 });
 
 it("ranks eligible overlapping candidates by center distance", () => {
@@ -120,6 +148,21 @@ it("ranks eligible overlapping candidates by center distance", () => {
 	moveFocus({ x: 0, y: 1 }, container);
 
 	expect(documentState.activeElement).toBe(buttons[0]);
+});
+
+it("breaks ties on the movement axis by cross-axis center distance", () => {
+	const { buttons, container, documentState } = setup(
+		[
+			{ left: 0, right: 100, top: 200, bottom: 240 },
+			{ left: 100, right: 200, top: 200, bottom: 240 },
+			{ left: 0, right: 300, top: 0, bottom: 100 },
+		],
+		2
+	);
+
+	moveFocus({ x: 0, y: 1 }, container);
+
+	expect(documentState.activeElement).toBe(buttons[1]);
 });
 
 it.each([
